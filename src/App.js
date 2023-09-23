@@ -23,6 +23,7 @@ function App() {
 
 
   const selectBranch = [
+    {id:-1, label: 'All', value: 'All' },
     {id:1, label: 'Athulya Homecare Chennai', value: 'Athulya Homecare Chennai' },
     {id:2, label: 'Athulya Homecare Bangalore', value: 'Athulya Homecare Bangalore' },
     {id:3, label: 'Athulya Homecare Cochin', value: 'Athulya Homecare Cochin' },
@@ -41,6 +42,9 @@ function App() {
   const [branch, setBranch] = useState('');
   const [invoiceamount,setinvoiceamount]=useState(0);
   const [receiptamount,setreceipamount]=useState(0);
+  const [completedschedulesamount,setcompletedschedulesamount]=useState(0);
+  const [pendingscheduleamount,setpendingschedulesamount]=useState(0);
+  const [estimatedamount,setestimatedamount]=useState(0);
   const [remainingamount,setremainingamount]=useState(0);
 
   const [servicecategory, setservicecategory]=useState([]);
@@ -125,6 +129,87 @@ function App() {
     return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
   };
   
+  const viewreceipts=()=>{
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy+'-'+mm+'-'+dd;
+    from_Date=!(fromDate)?today:from_Date;
+    to_Date=!(toDate)?today:to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    var select_branch=branch.id;
+     
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+    
+    axios.post(`http://localhost:4041/getreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    .then(response => {
+      //setData(response.data);
+      settabledata1(response.data.data);
+      console.log(response.data.data);
+    })
+    .catch(error => {
+      console.error('Error fetching data: ', error);
+    });
+    
+  }
+
+  const pendingreceipts=()=>{
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy+'-'+mm+'-'+dd;
+    from_Date=!(fromDate)?today:from_Date;
+    to_Date=!(toDate)?today:to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    var select_branch=branch.id;
+     
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+    
+    axios.post(`http://localhost:4041/getpendingreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    .then(response => {
+      //setData(response.data);
+      settabledata1(response.data.data);
+      console.log(response.data.data);
+    })
+    .catch(error => {
+      console.error('Error fetching data: ', error);
+    });
+    
+  }
 
   const fetchData = () => {
     var today = new Date();
@@ -153,7 +238,7 @@ function App() {
      
     console.log(from_Date);
     console.log(to_Date);
-    console.log(branch);
+    console.log(select_branch);
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
     axios.post(`http://localhost:4041/getinvoices?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
@@ -193,7 +278,10 @@ function App() {
         //setData(response.data);
         var invoice_amount=response.data.data['Invoice_Sum'];
         var receipt_amount=response.data.data['Receipt_Sum'];
+        var completedschedules_amount=response.data.data['Completed_Schedule_Sum'];
         var remaining_amount=invoice_amount-receipt_amount;
+        var estimated_sum=invoice_amount+completedschedules_amount;
+        var pendingschedule_amount=response.data.data['Pending_Schedules_Sum'];
         let rupeeIndian = Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
@@ -201,11 +289,16 @@ function App() {
         invoice_amount=rupeeIndian.format(invoice_amount);
         receipt_amount=rupeeIndian.format(receipt_amount);
         remaining_amount=rupeeIndian.format(remaining_amount);
-
+        completedschedules_amount=rupeeIndian.format(completedschedules_amount);
+        pendingschedule_amount=rupeeIndian.format(pendingschedule_amount);
+        estimated_sum=rupeeIndian.format(estimated_sum);
+       
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
         setremainingamount(remaining_amount);
-        
+        setcompletedschedulesamount(completedschedules_amount);
+        setestimatedamount(estimated_sum);
+        setpendingschedulesamount(pendingschedule_amount);
         //console.log(response.data.data);
         console.log(response.data.data['Invoice_Sum']);
       })
@@ -353,14 +446,17 @@ function App() {
     }
   };
 
+  const cursorstyle = {
+    cursor:'pointer'
+  };
 
   return (
     <div className="App">
        
-      <div class="mx-auto container-fluid grid grid-cols-8 border-solid border-1 border-white-500">
+      <div class="mx-auto container-fluid grid grid-cols-8 border-solid border-2  border-sky-500">
         
         {/* Replace border-2 border-sky-500 with border-1 border-white-500  */}
-        <div className='col-span-1  border-solid border-1 border-white-500'>
+        <div className='col-span-1  border-solid border-2  border-sky-500'>
 
               <div class="flex items-center justify-center h-14 border-b">
                 <div>Athulya Homecare</div>
@@ -421,15 +517,15 @@ function App() {
           
         </div>
         
-        <div className='col-span-7 grid grid-cols-7  bg-[#F3F4F6] border-solid border-1 border-white-500'>
-          <header class="col-span-7 h-16 bg-[#F3F4F6] border-solid border-1 border-white-500">
+        <div className='col-span-7 grid grid-cols-7  bg-[#F3F4F6] border-solid border-2  border-sky-500'>
+          <header class="col-span-7 h-16 bg-[#F3F4F6] border-solid border-2  border-sky-500">
               <h1 class="text-center text-2xl"></h1>
           </header>
            {/* Replace border-2 border-sky-500 with border-0 border-white-500  */}
           <main class="col-span-7 md:col-span-7  p-10 bg-[#F3F4F6] border-0 border-white-500">
             {/* Filters */}
-              <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-1 border-white-500">
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500">
+              <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-2  border-sky-500">
+                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
                   <Select
                     options={selectBranch}
                     name="branch_name"
@@ -440,7 +536,7 @@ function App() {
                   />
                     
                 </div>
-                {/* <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500">
+                {/* <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
                 <Select
                     options={selectDayorMonth}
                     name="day_or_month"
@@ -449,7 +545,7 @@ function App() {
                 
                   />
                 </div> */}
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500 w-full">
+                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500 w-full">
                 
                   
                    
@@ -466,7 +562,7 @@ function App() {
                 
                 
                 </div>
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500">
+                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
                 <DatePicker
                       selected={toDate}
                       onChange={handleToDate}
@@ -475,15 +571,15 @@ function App() {
                     />
 
                 </div>
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500">
+                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
                 <button class=" hover:bg-blue-700 text-white font-semibold hover:text-white h-full w-full bg-blue-500 border border-blue-500 hover:border-transparent rounded" onClick={fetchData}>
                   Filter
                 </button>
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-1 border-white-500">
-                <div className="rounded bg-white shadow-sm border-solid border-1 border-white-500">
+              <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
+                <div className="rounded bg-white shadow-sm border-solid border-2  border-sky-500">
                   <div class="flex items-center p-5 bg-white shadow rounded-lg">
                     <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-purple-600 bg-purple-100 rounded-full mr-6">
                       <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
@@ -496,7 +592,7 @@ function App() {
                     </div>
                   </div>
                 </div>
-                <div className="rounded bg-white  shadow-sm border-solid border-1 border-white-500">
+                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
 
                   <div class="flex items-center p-5 bg-white shadow rounded-lg">
                     <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-blue-600 bg-blue-100 rounded-full mr-6">
@@ -506,13 +602,13 @@ function App() {
                     </div>
                     <div>
                       <span class="block text-2xl font-bold" >{receiptamount}</span>
-                      <span class="block text-gray-500">Receipts</span>
+                      <span class="block text-gray-500" style={cursorstyle} onClick={viewreceipts}>Receipts</span>
                     </div>
                   </div>
 
                 </div>
 
-                <div className="rounded bg-white  shadow-sm border-solid border-1 border-white-500">
+                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
 
                   <div class="flex items-center p-5 bg-white shadow rounded-lg">
                     <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-green-600 bg-green-100 rounded-full mr-6">
@@ -522,7 +618,57 @@ function App() {
                     </div>
                     <div>
                       <span class="block text-2xl font-bold">{remainingamount}</span>
-                      <span class="block text-gray-500">Remaining</span>
+                      <span class="block text-gray-500" style={cursorstyle} onClick={pendingreceipts}>Remaining</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
+                <div className="rounded bg-white shadow-sm border-solid border-2  border-sky-500">
+                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
+                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-red-600 bg-red-100 rounded-full mr-6">
+                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="block text-2xl font-bold">{completedschedulesamount}</span>
+                      <span class="block text-gray-500">Completed Schedules</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
+
+                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
+                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-yellow-600 bg-yellow-100 rounded-full mr-6">
+                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="block text-2xl font-bold" >{estimatedamount}</span>
+                      <span class="block text-gray-500" style={cursorstyle} onClick={viewreceipts}>Invoices+Completed Schedules</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
+
+                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
+                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-indigo-600 bg-indigo-100 rounded-full mr-6">
+                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                         d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                         />
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="block text-2xl font-bold">{pendingscheduleamount}</span>
+                      <span class="block text-gray-500" style={cursorstyle} onClick={pendingreceipts}>Pending Schedules</span>
                     </div>
                   </div>
 
@@ -531,7 +677,7 @@ function App() {
               
               
 
-              <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-1 border-white-500">
+              <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-2  border-sky-500">
                 
                 
                 <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
@@ -544,7 +690,7 @@ function App() {
               </div>
                <br></br>
 
-               <div className="grid col-1 bg-white  shadow-sm border-solid border-1 border-white-500">
+               <div className="grid col-1 bg-white  shadow-sm border-solid border-2  border-sky-500">
                 
                 
                 <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
@@ -558,7 +704,7 @@ function App() {
               </div>
                <br></br>
             {/* List of Data */}
-              <div className="grid col-1 bg-white  shadow-sm border-solid border-1 border-white-500">
+              <div className="grid col-1 bg-white  shadow-sm border-solid border-2  border-sky-500">
                 
                 
               <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
@@ -756,25 +902,25 @@ function App() {
        
       </div>
 
-      {/* <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-1 border-white-500">
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500">
+      {/* <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-2  border-sky-500">
+        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
           
         </div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-1 border-white-500"></div>
+        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
       </div>
-      <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-1 border-white-500">
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-1 border-white-500"></div>
+      <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
+        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
       </div>
-      <div className="grid lg:grid-cols-2 gap-5 mb-16 border-solid border-1 border-white-500">
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-1 border-white-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-1 border-white-500"></div>
+      <div className="grid lg:grid-cols-2 gap-5 mb-16 border-solid border-2  border-sky-500">
+        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
+        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
       </div>
-      <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-1 border-white-500"></div> */}
+      <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-2  border-sky-500"></div> */}
 
 
     </div>
