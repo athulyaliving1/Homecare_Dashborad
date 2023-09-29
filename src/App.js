@@ -269,7 +269,7 @@ function App() {
     day = String(to_Date.getDate()).padStart(2, "0");
 
     to_Date = `${year}-${month}-${day}`;
-    var select_branch = branch.id;
+    const select_branch = branch.id;
 
     console.log(from_Date);
     console.log(to_Date);
@@ -319,7 +319,10 @@ function App() {
     console.log(select_branch);
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
-    axios.post(`http://localhost:4041/getinvoices?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+
+    const branchIdParam = select_branch !== undefined ? select_branch : '';
+    axios.post(`http://localhost:4041/getinvoices?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.data);
@@ -329,9 +332,10 @@ function App() {
         console.error('Error fetching data: ', error);
       });
 
-    axios.post(`http://localhost:4041/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    axios.post(`http://localhost:4041/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
-        //setData(response.data);
+        //setData(response.data);formattedTo_Date
         setservicecategory(response.data.data);
         //console.log(response.data.data);
         console.log(servicecategory);
@@ -340,12 +344,26 @@ function App() {
         console.error('Error fetching data: ', error);
       });
 
-    axios.post(`http://localhost:4041/getalldayinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+
+    axios.post(`http://localhost:4041/getalldayinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         setalldaydata(response.data.data);
         //console.log(response.data.data);
         console.log(alldaydata);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    let select_branchs = branch.id;
+    console.log(formattedFrom_Date, formattedTo_Date, select_branchs);
+
+    axios.post(`http://localhost:4041/getinvoicesbranches?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+      .then(response => {
+        setPiechartdata(response.data.data);
+        console.log(response.data.data);
       })
       .catch(error => {
         console.error('Error fetching data: ', error);
@@ -370,16 +388,8 @@ function App() {
     //   });
 
 
-    axios.post(`http://localhost:4041/getinvoicesbranches?&branch_id=${select_branch}&from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}`)
-      .then(response => {
-        setPiechartdata(response.data.data);
-        console.log(response.data.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data: ', error);
-      })
 
-    axios.post(`http://localhost:4041/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    axios.post(`http://localhost:4041/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         var invoice_amount = response.data.data['Invoice_Sum'];
@@ -860,7 +870,7 @@ function App() {
 
                       {tabledata1.map((item, index) => (
                         <React.Fragment key={index}>
-                          <tr className='bg-white border-b border-gray-100 even:bg-[#F5FCCD] odd:bg-[#78D6C6]'>
+                          <tr className='bg-white border-b border-gray-100 even:bg-[#839B97] odd:bg-[#CFD3CE]'>
                             <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
@@ -881,7 +891,7 @@ function App() {
                           {detailsVisible[item.id] && (
                             <tr className="">
 
-                              <td className=''>
+                              <td colSpan="10" className=''>
                                 <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1] ">
 
                                   <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Sno</div>
@@ -955,10 +965,7 @@ function App() {
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
-
                             <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
-
-
                           </tr>
 
 
