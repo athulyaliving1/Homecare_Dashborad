@@ -4,6 +4,8 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'
 import CanvasJSReact from '@canvasjs/react-stockcharts';
+import { URLDevelopment } from "./utilities/Url.js";
+
 
 import axios from 'axios';
 function App() {
@@ -74,7 +76,7 @@ function App() {
 
   const fetchMastersevices = async () => {
     try {
-      const response = await fetch(`http://localhost:4041/getmasterservices`);
+      const response = await fetch(`${URLDevelopment}/getmasterservices`);
       const data = await response.json();
 
       console.log(data);
@@ -139,7 +141,7 @@ function App() {
     console.log(branch);
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
-    axios.post(`http://localhost:4041/getserviceinvoicesplitup?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}&service_name=${category}`)
+    axios.post(`${URLDevelopment}/getserviceinvoicesplitup?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}&service_name=${category}`)
       .then(response => {
         //setData(response.data);
         setselecttype('Category');
@@ -192,7 +194,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    axios.post(`http://localhost:4041/getreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    axios.post(`${URLDevelopment}/getreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.data);
@@ -233,7 +235,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    axios.post(`http://localhost:4041/getpendingreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    axios.post(`${URLDevelopment}/getpendingreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.data);
@@ -275,7 +277,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    axios.post(`http://localhost:4041/getcompletedschedules?from_date=2023-08-27&to_date=2023-09-27&branch_id=1`)
+    axios.post(`${URLDevelopment}/getcompletedschedules?from_date=2023-08-27&to_date=2023-09-27&branch_id=1`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.success);
@@ -322,7 +324,7 @@ function App() {
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
     const branchIdParam = select_branch !== undefined ? select_branch : '';
-    axios.post(`http://localhost:4041/getinvoices?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+    axios.post(`${URLDevelopment}/getinvoices?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.data);
@@ -333,7 +335,7 @@ function App() {
       });
 
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
-    axios.post(`http://localhost:4041/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+    axios.post(`${URLDevelopment}/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);formattedTo_Date
         setservicecategory(response.data.data);
@@ -345,7 +347,7 @@ function App() {
       });
 
 
-    axios.post(`http://localhost:4041/getalldayinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+    axios.post(`${URLDevelopment}/getalldayinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         setalldaydata(response.data.data);
@@ -360,7 +362,7 @@ function App() {
     let select_branchs = branch.id;
     console.log(formattedFrom_Date, formattedTo_Date, select_branchs);
 
-    axios.post(`http://localhost:4041/getinvoicesbranches?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+    axios.post(`${URLDevelopment}/getinvoicesbranches?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         setPiechartdata(response.data.data);
         console.log(response.data.data);
@@ -369,7 +371,7 @@ function App() {
         console.error('Error fetching data: ', error);
       });
 
-    // axios.post(`http://localhost:4041/getcompletedschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    // axios.post(`{URLDevelopment}/getcompletedschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
     //   .then(response => {
     //     setGetcompletedschedules(response.data.data);
     //     console.log(response.data.data);
@@ -378,7 +380,7 @@ function App() {
     //     console.error('Error fetching data: ', error);
     //   });
 
-    // axios.post(`http://localhost:4041/getpendingschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    // axios.post(`{URLDevelopment}/getpendingschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
     //   .then(response => {
     //     setGetpendingschedules(response.data.data);
     //     console.log(response.data.data);
@@ -389,7 +391,7 @@ function App() {
 
 
 
-    axios.post(`http://localhost:4041/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
+    axios.post(`${URLDevelopment}/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
         var invoice_amount = response.data.data['Invoice_Sum'];
@@ -523,7 +525,7 @@ function App() {
       const requestBody = {
         id: id,
       };
-      const response = await fetch(`http://localhost:4041/getinvoicesplitup?invoice_id=${id}`, {
+      const response = await fetch(`${URLDevelopment}/getinvoicesplitup?invoice_id=${id}`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
