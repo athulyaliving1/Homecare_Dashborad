@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'
@@ -7,6 +7,42 @@ import CanvasJSReact from '@canvasjs/react-stockcharts';
 
 import axios from 'axios';
 function App() {
+
+
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [branch, setBranch] = useState('');
+  const [invoiceamount, setinvoiceamount] = useState(0);
+  const [receiptamount, setreceipamount] = useState(0);
+  const [completedschedulesamount, setcompletedschedulesamount] = useState(0);
+  const [pendingscheduleamount, setpendingschedulesamount] = useState(0);
+  const [estimatedamount, setestimatedamount] = useState(0);
+  const [remainingamount, setremainingamount] = useState(0);
+
+  const [servicecategory, setservicecategory] = useState([]);
+  const [tabledata1, settabledata1] = useState([]);
+  const [tabledata2, settabledata2] = useState([]);
+  const [alldaydata, setalldaydata] = useState([]);
+  const [selecttype, setselecttype] = useState('Invoices');
+  const [splitup, setSplitup] = useState({});
+  const [masterservices, setMasterservices] = useState([]);
+  // const [getcompletedschedules, setGetcompletedschedules] = useState([]);
+  // const [getpendingschedules, setGetpendingschedules] = useState([]);
+  // const [selectedServices, setSelectedServices] = useState([]);
+  const [piechartdata, setPiechartdata] = useState([]);
+
+
+
+
+  useEffect(() => {
+    fetchData();
+    fetchMastersevices();
+    console.log(selecttype);
+  }, []);
+
+
+
+
 
   var CanvasJS = CanvasJSReact.CanvasJS;
   var CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
@@ -21,53 +57,51 @@ function App() {
     margin: "auto"
   };
 
+  //-----------------------------------------------------------------Branch Data Fetching----------------------------------------------------------------
+
 
   const selectBranch = [
-    {id:-1, label: 'All', value: 'All' },
-    {id:1, label: 'Athulya Homecare Chennai', value: 'Athulya Homecare Chennai' },
-    {id:2, label: 'Athulya Homecare Bangalore', value: 'Athulya Homecare Bangalore' },
-    {id:3, label: 'Athulya Homecare Cochin', value: 'Athulya Homecare Cochin' },
-    {id:4, label: 'Athulya Homecare Hyderabad', value: 'Athulya Homecare Hyderabad' },
-    {id:5, label: 'Athulya Homecare Coimbatore', value: 'Athulya Homecare Coimbatore' },
-  
-  ];
-  
-  const selectDayorMonth = [
-    { label: 'Day', value: 'Day' },
-    { label: 'Month', value: 'Month' }
-  
-  ];
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
-  const [branch, setBranch] = useState('');
-  const [invoiceamount,setinvoiceamount]=useState(0);
-  const [receiptamount,setreceipamount]=useState(0);
-  const [completedschedulesamount,setcompletedschedulesamount]=useState(0);
-  const [pendingscheduleamount,setpendingschedulesamount]=useState(0);
-  const [estimatedamount,setestimatedamount]=useState(0);
-  const [remainingamount,setremainingamount]=useState(0);
+    { id: -1, label: 'All', value: 'All' },
+    { id: 1, label: 'Athulya Homecare Chennai', value: 'Athulya Homecare Chennai' },
+    { id: 2, label: 'Athulya Homecare Bangalore', value: 'Athulya Homecare Bangalore' },
+    { id: 3, label: 'Athulya Homecare Cochin', value: 'Athulya Homecare Cochin' },
+    { id: 4, label: 'Athulya Homecare Hyderabad', value: 'Athulya Homecare Hyderabad' },
+    { id: 5, label: 'Athulya Homecare Coimbatore', value: 'Athulya Homecare Coimbatore' },
 
-  const [servicecategory, setservicecategory]=useState([]);
-  const [tabledata1,settabledata1]=useState([]);
-  const [tabledata2,settabledata2]=useState([]);
-  const [alldaydata,setalldaydata]=useState([]);
-  const [selecttype,setselecttype]=useState('Invoices');
-  const [splitup, setSplitup] = useState({});
-  useEffect(() => {
-    fetchData();
-    console.log(selecttype);
-  }, []);
+  ];
+
+  //---------------------------------------------------------------- Master Services data Fetching----------------------------------------------------------------
+
+  const fetchMastersevices = async () => {
+    try {
+      const response = await fetch(`http://localhost:4041/getmasterservices`);
+      const data = await response.json();
+
+      console.log(data);
+      const masterserviceOption = data.map((service) => ({
+        value: service.service_name,
+        label: service.service_name
+      }));
+      console.log(masterserviceOption.value);
+
+      setMasterservices(masterserviceOption);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
 
   const handleFromDate = (date) => {
     setFromDate(date);
   };
 
-  const handleBranch=(branch)=>{
+  const handleBranch = (branch) => {
     setBranch(branch);
   }
-  const handleToDate=(date)=>{
+  const handleToDate = (date) => {
     setToDate(date);
   }
+
   const handleDataPointClick = (dataPoint) => {
     console.log(`You clicked on ${dataPoint.label} with value ${dataPoint.y}`);
     var today = new Date();
@@ -75,9 +109,9 @@ function App() {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
 
-    today = yyyy+'-'+mm+'-'+dd;
-    from_Date=!(fromDate)?today:from_Date;
-    to_Date=!(toDate)?today:to_Date;
+    today = yyyy + '-' + mm + '-' + dd;
+    from_Date = !(fromDate) ? today : from_Date;
+    to_Date = !(toDate) ? today : to_Date;
 
     var from_Date = new Date(fromDate);
     var year = from_Date.getFullYear();
@@ -92,14 +126,14 @@ function App() {
     day = String(to_Date.getDate()).padStart(2, "0");
 
     to_Date = `${year}-${month}-${day}`;
-    var category=dataPoint.label;
-    var select_branch=branch.id;
-     
+    var category = dataPoint.label;
+    var select_branch = branch.id;
+
     console.log(from_Date);
     console.log(to_Date);
     console.log(branch);
     console.log(category);
- 
+
     console.log(from_Date);
     console.log(to_Date);
     console.log(branch);
@@ -115,29 +149,29 @@ function App() {
       .catch(error => {
         console.error('Error fetching data: ', error);
       });
-   
+
 
   };
-  
-  
+
+
   const addSymbols = (e) => {
     var suffixes = ["", "K", "M", "B"];
     var order = Math.max(Math.floor(Math.log(Math.abs(e.value)) / Math.log(1000)), 0);
-    if(order > suffixes.length - 1)
+    if (order > suffixes.length - 1)
       order = suffixes.length - 1;
     var suffix = suffixes[order];
     return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
   };
-  
-  const viewreceipts=()=>{
+
+  const viewreceipts = () => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
 
-    today = yyyy+'-'+mm+'-'+dd;
-    from_Date=!(fromDate)?today:from_Date;
-    to_Date=!(toDate)?today:to_Date;
+    today = yyyy + '-' + mm + '-' + dd;
+    from_Date = !(fromDate) ? today : from_Date;
+    to_Date = !(toDate) ? today : to_Date;
 
     var from_Date = new Date(fromDate);
     var year = from_Date.getFullYear();
@@ -152,96 +186,13 @@ function App() {
     day = String(to_Date.getDate()).padStart(2, "0");
 
     to_Date = `${year}-${month}-${day}`;
-    var select_branch=branch.id;
-     
+    var select_branch = branch.id;
+
     console.log(from_Date);
     console.log(to_Date);
     console.log(select_branch);
-    
+
     axios.post(`http://localhost:4041/getreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
-    .then(response => {
-      //setData(response.data);
-      settabledata1(response.data.data);
-      console.log(response.data.data);
-    })
-    .catch(error => {
-      console.error('Error fetching data: ', error);
-    });
-    
-  }
-
-  const pendingreceipts=()=>{
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-
-    today = yyyy+'-'+mm+'-'+dd;
-    from_Date=!(fromDate)?today:from_Date;
-    to_Date=!(toDate)?today:to_Date;
-
-    var from_Date = new Date(fromDate);
-    var year = from_Date.getFullYear();
-    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
-    var day = String(from_Date.getDate()).padStart(2, "0");
-
-    from_Date = `${year}-${month}-${day}`;
-
-    var to_Date = new Date(toDate);
-    year = to_Date.getFullYear();
-    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
-    day = String(to_Date.getDate()).padStart(2, "0");
-
-    to_Date = `${year}-${month}-${day}`;
-    var select_branch=branch.id;
-     
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
-    
-    axios.post(`http://localhost:4041/getpendingreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
-    .then(response => {
-      //setData(response.data);
-      settabledata1(response.data.data);
-      console.log(response.data.data);
-    })
-    .catch(error => {
-      console.error('Error fetching data: ', error);
-    });
-    
-  }
-
-  const fetchData = () => {
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-
-    today = yyyy+'-'+mm+'-'+dd;
-    from_Date=!(fromDate)?today:from_Date;
-    to_Date=!(toDate)?today:to_Date;
-
-    var from_Date = new Date(fromDate);
-    var year = from_Date.getFullYear();
-    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
-    var day = String(from_Date.getDate()).padStart(2, "0");
-
-    from_Date = `${year}-${month}-${day}`;
-
-    var to_Date = new Date(toDate);
-    year = to_Date.getFullYear();
-    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
-    day = String(to_Date.getDate()).padStart(2, "0");
-
-    to_Date = `${year}-${month}-${day}`;
-    var select_branch=branch.id;
-     
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
-    //from_Date='2023-09-01';
-    //to_Date='2023-09-24';
-    axios.post(`http://localhost:4041/getinvoices?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
         settabledata1(response.data.data);
@@ -250,8 +201,135 @@ function App() {
       .catch(error => {
         console.error('Error fetching data: ', error);
       });
-   
-      axios.post(`http://localhost:4041/getserviceinvoice?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+
+  }
+
+  const pendingreceipts = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    from_Date = !(fromDate) ? today : from_Date;
+    to_Date = !(toDate) ? today : to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    var select_branch = branch.id;
+
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+
+    axios.post(`http://localhost:4041/getpendingreceipts?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+      .then(response => {
+        //setData(response.data);
+        settabledata1(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+  }
+
+
+  const completedschedules = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    from_Date = !(fromDate) ? today : from_Date;
+    to_Date = !(toDate) ? today : to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    var select_branch = branch.id;
+
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+
+    axios.post(`http://localhost:4041/getcompletedschedules?from_date=2023-08-27&to_date=2023-09-27&branch_id=1`)
+      .then(response => {
+        //setData(response.data);
+        settabledata1(response.data.success);
+        console.log(response.data.success);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+  }
+
+
+
+  const fetchData = () => {
+
+    const from_Date = fromDate ? new Date(fromDate) : new Date();
+
+    // Convert fromDate to the required format
+    const fromYear = from_Date.getFullYear();
+    const fromMonth = String(from_Date.getMonth() + 1).padStart(2, '0');
+    const fromDay = String(from_Date.getDate()).padStart(2, '0');
+    const formattedFrom_Date = `${fromYear}-${fromMonth}-${fromDay}`;
+
+    // Get the current date if toDate is not selected
+    const to_Date = toDate ? new Date(toDate) : new Date();
+
+    // Convert toDate to the required format
+    const toYear = to_Date.getFullYear();
+    const toMonth = String(to_Date.getMonth() + 1).padStart(2, '0');
+    const toDay = String(to_Date.getDate()).padStart(2, '0');
+    const formattedTo_Date = `${toYear}-${toMonth}-${toDay}`;
+
+    // Rest of your code for API calls using Axios...
+
+    console.log('From Date:', formattedFrom_Date);
+    console.log('To Date:', formattedTo_Date);
+    console.log('Branch ID:', branch.id);
+    var select_branch = branch.id;
+
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+    //from_Date='2023-09-01';
+    //to_Date='2023-09-24';
+    axios.post(`http://localhost:4041/getinvoices?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+      .then(response => {
+        //setData(response.data);
+        settabledata1(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+    axios.post(`http://localhost:4041/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
         setservicecategory(response.data.data);
@@ -262,7 +340,7 @@ function App() {
         console.error('Error fetching data: ', error);
       });
 
-      axios.post(`http://localhost:4041/getalldayinvoice?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    axios.post(`http://localhost:4041/getalldayinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
         setalldaydata(response.data.data);
@@ -273,26 +351,54 @@ function App() {
         console.error('Error fetching data: ', error);
       });
 
-      axios.post(`http://localhost:4041/getsummary?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    // axios.post(`http://localhost:4041/getcompletedschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    //   .then(response => {
+    //     setGetcompletedschedules(response.data.data);
+    //     console.log(response.data.data);
+    //   })
+    //   .catch(error => {
+    //     console.error('Error fetching data: ', error);
+    //   });
+
+    // axios.post(`http://localhost:4041/getpendingschedules?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
+    //   .then(response => {
+    //     setGetpendingschedules(response.data.data);
+    //     console.log(response.data.data);
+    //   })
+    //   .catch(error => {
+    //     console.error('Error fetching data: ', error);
+    //   });
+
+
+    axios.post(`http://localhost:4041/getinvoicesbranches?&branch_id=${select_branch}&from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}`)
+      .then(response => {
+        setPiechartdata(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      })
+
+    axios.post(`http://localhost:4041/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${select_branch}`)
       .then(response => {
         //setData(response.data);
-        var invoice_amount=response.data.data['Invoice_Sum'];
-        var receipt_amount=response.data.data['Receipt_Sum'];
-        var completedschedules_amount=response.data.data['Completed_Schedule_Sum'];
-        var remaining_amount=invoice_amount-receipt_amount;
-        var estimated_sum=invoice_amount+completedschedules_amount;
-        var pendingschedule_amount=response.data.data['Pending_Schedules_Sum'];
+        var invoice_amount = response.data.data['Invoice_Sum'];
+        var receipt_amount = response.data.data['Receipt_Sum'];
+        var completedschedules_amount = response.data.data['Completed_Schedule_Sum'];
+        var remaining_amount = invoice_amount - receipt_amount;
+        var estimated_sum = invoice_amount + completedschedules_amount;
+        var pendingschedule_amount = response.data.data['Pending_Schedules_Sum'];
         let rupeeIndian = Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
         });
-        invoice_amount=rupeeIndian.format(invoice_amount);
-        receipt_amount=rupeeIndian.format(receipt_amount);
-        remaining_amount=rupeeIndian.format(remaining_amount);
-        completedschedules_amount=rupeeIndian.format(completedschedules_amount);
-        pendingschedule_amount=rupeeIndian.format(pendingschedule_amount);
-        estimated_sum=rupeeIndian.format(estimated_sum);
-       
+        invoice_amount = rupeeIndian.format(invoice_amount);
+        receipt_amount = rupeeIndian.format(receipt_amount);
+        remaining_amount = rupeeIndian.format(remaining_amount);
+        completedschedules_amount = rupeeIndian.format(completedschedules_amount);
+        pendingschedule_amount = rupeeIndian.format(pendingschedule_amount);
+        estimated_sum = rupeeIndian.format(estimated_sum);
+
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
         setremainingamount(remaining_amount);
@@ -303,13 +409,14 @@ function App() {
         console.log(response.data.data['Invoice_Sum']);
       })
       .catch(error => {
+
         console.error('Error fetching data: ', error);
       });
   };
-  
+
   const stock_chart_options = {
-    title:{
-      text:"Invoices Generated"
+    title: {
+      text: "Invoices Generated"
     },
     subtitles: [{
       text: "INR"
@@ -341,7 +448,7 @@ function App() {
         type: "splineArea",
         xValueFormatString: "DD-MM-YY",
         color: "#3576a8",
-        dataPoints:alldaydata
+        dataPoints: alldaydata
       }],
       navigator: {
         slider: {
@@ -350,22 +457,14 @@ function App() {
         }
       }
 
-    }],    
-    // rangeSelector: {
-    //   inputFields: {
-    //     startValue: 0,
-    //     endValue: 600000,
-    //     valueFormatString: "###0"
-    //   },
-      
-      
-    // }
+    }],
+
   };
 
   const category_chart_options = {
     animationEnabled: true,
     theme: "light2",
-    title:{
+    title: {
       text: "Invoices Created Based on Category"
     },
     axisX: {
@@ -385,36 +484,30 @@ function App() {
         handleDataPointClick(dataPoint);
       }
     }],
-    
+
   }
-  const [selectedData, setSelectedData] = useState('data1');
-  const data = {
-    labels: ['Red', 'Blue', 'Yellow'],
-    datasets: [
-      {
-        data: [300, 50, 100],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-      },
-    ],
-  };
-  
 
 
-  const [detailsVisible, setDetailsVisible] = useState(Array(data.length).fill(false));
-
-  // Sample data
-  // const tabledata = [
-  //   { name: 'John Doe', patient_id:'ATH-COC124', invoice_no: 'INV452', invoice_no: 'INV452',invoice_date: '2023-09-10', amount:12000, status: 'Pending' },
-  //   { name: 'Jane Smith',patient_id:'ATH-COC125', invoice_no: 'INV453', invoice_date: '2023-09-10', amount:2000,status: 'Pending' },
-  //   { name: 'Bob Johnson',patient_id:'ATH-COC126',  invoice_no: 'INV454',invoice_date: '2023-09-10', amount:10000,status: 'Pending' },
-  // ];
-
-  // const toggleDetails = (index) => {
-  //   const newDetailsVisible = [...detailsVisible];
-  //   newDetailsVisible[index] = !newDetailsVisible[index];
-  //   setDetailsVisible(newDetailsVisible);
+  // const data = {
+  //   labels: ['Red', 'Blue', 'Yellow'],
+  //   datasets: [
+  //     {
+  //       data: [300, 50, 100],
+  //       backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+  //       hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+  //     },
+  //   ],
   // };
+
+
+  const [detailsVisible, setDetailsVisible] = useState((false));
+
+  // const handleMasterChange = (e) => {
+  //   setSelectedServices(e.target.value);
+  // }
+
+
+
   const toggleDetails = async (id) => {
     try {
       const requestBody = {
@@ -446,483 +539,453 @@ function App() {
     }
   };
 
+
+  //===================================================Cursor Style========================================================= 
+
   const cursorstyle = {
-    cursor:'pointer'
+    cursor: 'pointer'
   };
+
+
+
+  //--------------------------------Pie Charts Data Fetching-----------------------------------------  
+  useEffect(() => {
+    const dataPoints = piechartdata.map(item => ({
+      y: item.total_amount_sum,
+      label: item.branch_name,
+      yValueFormatString: "#,##0,###"
+
+    }));
+
+    const options = {
+      animationEnabled: true,
+      exportEnabled: true,
+      theme: "light",
+      title: {
+        text: "Facility Wise Pie-Chart"
+      },
+      data: [{
+        type: "pie",
+        indexLabel: "{label}: ₹{y}",
+        startAngle: -180,
+        dataPoints: dataPoints,
+      }]
+    };
+
+    const chart = new CanvasJS.Chart("chartContainer", options);
+    chart.render();
+  }, [piechartdata]); // piechartdata as a dependency
+  // Empty dependency array to run this effect only once
+
+
+
+
+
+  //--------------------------------------------------------------------------------------------PIE CHART Container ---------------------------------------------------
+  const chartContainerStyle = {
+    position: "relative",
+    width: "100%",
+    height: "400px"
+  };
+
+
 
   return (
     <div className="App">
-       
-      <div class="mx-auto container-fluid grid grid-cols-8 border-solid border-2  border-sky-500">
-        
-        {/* Replace border-2 border-sky-500 with border-1 border-white-500  */}
-        <div className='col-span-1  border-solid border-2  border-sky-500'>
 
-              <div class="flex items-center justify-center h-14 border-b">
-                <div>Athulya Homecare</div>
-              </div>
-              <div class="overflow-y-auto overflow-x-hidden flex-grow">
-                <ul class="flex flex-col py-4 space-y-1">
-                  <li class="px-5">
-                    <div class="flex flex-row items-center h-8">
-                      <div class="text-sm font-light tracking-wide text-gray-500">Menu</div>
-                    </div>
-                  </li>
-                  <li>
-                    <a href="#" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                      <span class="inline-flex justify-center items-center ml-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                      </span>
-                      <span class="ml-2 text-sm tracking-wide truncate">Dashboard</span>
-                    </a>
-                  </li>
-                 
-                  <li class="px-5">
-                    <div class="flex flex-row items-center h-8">
-                      <div class="text-sm font-light tracking-wide text-gray-500">Settings</div>
-                    </div>
-                  </li>
-                  <li>
-                    <a href="#" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                      <span class="inline-flex justify-center items-center ml-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                      </span>
-                      <span class="ml-2 text-sm tracking-wide truncate">Profile</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                      <span class="inline-flex justify-center items-center ml-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                      </span>
-                      <span class="ml-2 text-sm tracking-wide truncate">Settings</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                      <span class="inline-flex justify-center items-center ml-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                      </span>
-                      <span class="ml-2 text-sm tracking-wide truncate">Logout</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            
-          
-       
-          
+      <div className="mx-auto container-fluid">
+
+        {/* Replace border-2  with border-1 border-white-500  */}
+
+        {/*    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-gray-50 text-gray-800">
+          <div class="fixed flex flex-col top-0 left-0 w-64 bg-[#12486B] h-full shadow-lg">
+
+            <div class="overflow-y-auto overflow-x-hidden flex-grow">
+              <ul class="flex flex-col py-6 space-y-1">
+                <li class="px-5">
+                  <div class="flex flex-row items-center h-8">
+                    <div class="flex font-semibold text-sm text-gray-300 my-4 font-sans uppercase">Dashboard</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-700 text-gray-500 hover:text-gray-200 border-l-4 border-transparent hover:border-blue-500 pr-6">
+                    <span class="inline-flex justify-center items-center ml-4">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    </span>
+                    <span class="ml-2 font-semibold text-sm tracking-wide truncate font-sans">Home</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-        
-        <div className='col-span-7 grid grid-cols-7  bg-[#F3F4F6] border-solid border-2  border-sky-500'>
-          <header class="col-span-7 h-16 bg-[#F3F4F6] border-solid border-2  border-sky-500">
-              <h1 class="text-center text-2xl"></h1>
+        */}
+
+
+
+
+        <div className='col-span-7 grid grid-cols-7  bg-[#F3F4F6] border-solid border-2  '>
+          <header className="col-span-7 h-16 bg-[#F3F4F6] border-solid border-2  ">
+
+            <div className="container flex justify-between h-16 mx-auto">
+              <img
+                className="w-5/12 bg-white rounded-md xl:w-1/12 2xl:h-5/6 desktop:w-1/12 md:w-2/12 lg:w-2/12"
+                src="https://www.athulyahomecare.com/lp/ophthalmology/Assest/logo.png"
+                alt="logo"
+              />
+
+              <button className="p-4 lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 ">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
           </header>
-           {/* Replace border-2 border-sky-500 with border-0 border-white-500  */}
-          <main class="col-span-7 md:col-span-7  p-10 bg-[#F3F4F6] border-0 border-white-500">
+
+
+          {/* Replace border-2  with border-0 border-white-500  */}
+          <main className="col-span-7 md:col-span-7  p-10 bg-[#F3F4F6] border-0 border-white-500">
             {/* Filters */}
-              <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-2  border-sky-500">
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
-                  <Select
-                    options={selectBranch}
-                    name="branch_name"
-                    className="branch_name"
-                    placeholder="Select Branch"
-                    onChange={handleBranch}
-                     
-                  />
-                    
-                </div>
-                {/* <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
+            <div className="grid gap-5 mb-16 lg:grid-cols-5 ">
+              <div className="h-10 rounded shadow-sm ">
                 <Select
-                    options={selectDayorMonth}
-                    name="day_or_month"
-                    className="day_or_month"
-                    placeholder="Day/Month"
-                
-                  />
-                </div> */}
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500 w-full">
-                
-                  
-                   
+                  options={selectBranch}
+                  name="branch_name"
+                  className="branch_name"
+                  placeholder="Select Branch"
+                  onChange={handleBranch}
+
+                />
+
+              </div>
+
+              <div className="w-full h-10 rounded shadow-sm ">
                 <DatePicker
-                      selected={fromDate}
-                      onChange={handleFromDate}
-                      className="border border-gray-300 h-9 rounded-md  px-2 outline-none w-full"
-                      placeholderText="From Date"
-                    />
+                  selected={fromDate}
+                  onChange={handleFromDate}
+                  className="w-full px-2 border border-gray-300 rounded-md outline-none h-9"
+                  placeholderText="From Date"
+                />
 
-
-                    
-                  
-                
-                
-                </div>
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
+              </div>
+              <div className="h-10 rounded shadow-sm ">
                 <DatePicker
-                      selected={toDate}
-                      onChange={handleToDate}
-                      className="border border-gray-300 h-9 rounded-md  px-2 outline-none w-full"
-                      placeholderText="To Date"
-                    />
+                  selected={toDate}
+                  onChange={handleToDate}
+                  className="w-full px-2 border border-gray-300 rounded-md outline-none h-9"
+                  placeholderText="To Date"
+                />
+              </div>
 
-                </div>
-                <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
-                <button class=" hover:bg-blue-700 text-white font-semibold hover:text-white h-full w-full bg-blue-500 border border-blue-500 hover:border-transparent rounded" onClick={fetchData}>
+              <div className='h-10 rounded shadow-sm'>
+
+
+                <Select
+                  options={masterservices}
+                  name="masterservices"
+                  className="h-10 rounded shadow-sm"
+                  placeholder="Select services"
+                // onChange={handleMasterChange}
+
+                />
+              </div>
+
+              <div className="h-10 rounded shadow-sm ">
+                <button className=" hover:bg-[#003f5c] text-white font-semibold hover:text-white h-full w-full bg-[#3d708f] border  hover:border-transparent rounded" onClick={fetchData}>
                   Filter
                 </button>
-                </div>
               </div>
+            </div>
 
-              <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
-                <div className="rounded bg-white shadow-sm border-solid border-2  border-sky-500">
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-purple-600 bg-purple-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-2xl font-bold">{invoiceamount}</span>
-                      <span class="block text-gray-500"> Invoices</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
 
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-blue-600 bg-blue-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-2xl font-bold" >{receiptamount}</span>
-                      <span class="block text-gray-500" style={cursorstyle} onClick={viewreceipts}>Receipts</span>
+            <div>
+              <div className="flex flex-wrap">
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                  <div className="p-5 border-b-4 border-green-600 rounded-lg shadow-xl bg-gradient-to-b from-green-200 to-green-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-green-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+                        <h2 className="font-bold text-gray-600 uppercase">Invoices</h2>
+                        <p className="text-3xl font-bold">{invoiceamount} <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                      </div>
                     </div>
                   </div>
 
                 </div>
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
-                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
-
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-green-600 bg-green-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-2xl font-bold">{remainingamount}</span>
-                      <span class="block text-gray-500" style={cursorstyle} onClick={pendingreceipts}>Remaining</span>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
-                <div className="rounded bg-white shadow-sm border-solid border-2  border-sky-500">
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-red-600 bg-red-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-2xl font-bold">{completedschedulesamount}</span>
-                      <span class="block text-gray-500">Completed Schedules</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
-
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-yellow-600 bg-yellow-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="block text-2xl font-bold" >{estimatedamount}</span>
-                      <span class="block text-gray-500" style={cursorstyle} onClick={viewreceipts}>Invoices+Completed Schedules</span>
+                  <div className="p-5 border-b-4 border-pink-500 rounded-lg shadow-xl bg-gradient-to-b from-pink-200 to-pink-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-pink-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M3 5.25A2.25 2.25 0 0 1 5.25 3h9.5A2.25 2.25 0 0 1 17 5.25V14h4v3.75A3.25 3.25 0 0 1 17.75 21H6.25A3.25 3.25 0 0 1 3 17.75V5.25ZM17 19.5h.75a1.75 1.75 0 0 0 1.75-1.75V15.5H17v4ZM6.5 7.75c0 .414.336.75.75.75h5.5a.75.75 0 0 0 0-1.5h-5.5a.75.75 0 0 0-.75.75ZM7.25 11a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Zm-.75 4.75c0 .414.336.75.75.75h3a.75.75 0 0 0 0-1.5h-3a.75.75 0 0 0-.75.75Z" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+                        <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Receipts</h2>
+                        <p className="text-3xl font-bold">{receiptamount}<span className="text-pink-500"><i className="fas fa-exchange-alt"></i></span></p>
+                      </div>
                     </div>
                   </div>
 
                 </div>
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
-                <div className="rounded bg-white  shadow-sm border-solid border-2  border-sky-500">
-
-                  <div class="flex items-center p-5 bg-white shadow rounded-lg">
-                    <div class="inline-flex flex-shrink-0 items-center justify-center h-16 w-16 text-indigo-600 bg-indigo-100 rounded-full mr-6">
-                      <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                         d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                         />
-                      </svg>
+                  <div className="p-5 border-b-4 border-yellow-600 rounded-lg shadow-xl bg-gradient-to-b from-yellow-200 to-yellow-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-yellow-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 20 20"><path fill="#ffff" fillRule="evenodd" d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0A2.213 2.213 0 0 1 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344l-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344l-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Zm4.822 4.997a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 0 0 1.004-1.114L8.704 8.75h1.921a1.875 1.875 0 0 1 0 3.75a.75.75 0 0 0 0 1.5a3.375 3.375 0 1 0 0-6.75h-1.92l1.047-.943Z" clipRule="evenodd" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+                        <h2 style={cursorstyle} onClick={pendingreceipts} className="font-bold text-gray-600 uppercase">Remaining</h2>
+                        <p className="text-3xl font-bold">{remainingamount} <span className="text-yellow-600"><i className="fas fa-caret-up"></i></span></p>
+                      </div>
                     </div>
-                    <div>
-                      <span class="block text-2xl font-bold">{pendingscheduleamount}</span>
-                      <span class="block text-gray-500" style={cursorstyle} onClick={pendingreceipts}>Pending Schedules</span>
+                  </div>
+
+                </div>
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                  <div className="p-5 border-b-4 border-blue-500 rounded-lg shadow-xl bg-gradient-to-b from-blue-200 to-blue-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-blue-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+                        <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
+                        <p className="text-3xl font-bold">{completedschedulesamount}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                  <div className="p-5 border-b-4 border-indigo-500 rounded-lg shadow-xl bg-gradient-to-b from-indigo-200 to-indigo-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-indigo-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M4 2v20l2-1l2 1l2-1l2 1l2-1l2 1l2-1l2 1V2l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1Z" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8m4 1V7" /></g></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+                        <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Invoices+Completed Schedules</h2>
+                        <p className="text-3xl font-bold">{estimatedamount}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                  <div className="p-5 border-b-4 border-red-500 rounded-lg shadow-xl bg-gradient-to-b from-red-200 to-red-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 bg-red-600 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center" >
+                        <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingreceipts}>Pending Schedules</h2>
+                        <p className="text-3xl font-bold">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
+                      </div>
                     </div>
                   </div>
 
                 </div>
               </div>
-              
-              
-
-              <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-2  border-sky-500">
-                
-                
-                <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
-                    
-                    <CanvasJSStockChart containerProps={containerProps} options = {stock_chart_options}/>
-  
-                </div>
+            </div>
 
 
+            <div className="grid shadow-sm col-2 h-96 ">
+              <div className="relative overflow-x-auto bg-white border-2 border-solid rounded shadow-md sm:rounded-lg">
+                <CanvasJSStockChart containerProps={containerProps} options={stock_chart_options} />
               </div>
-               <br></br>
 
-               <div className="grid col-1 bg-white  shadow-sm border-solid border-2  border-sky-500">
-                
-                
-                <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
-                    
-                   <CanvasJSChart options = {category_chart_options} />
-                
-
-                </div>
-
-
+            </div>
+            <br></br>
+            <div className="grid grid-cols-1 shadow-sm container-fluid lg:grid-cols-2">
+              <div className="relative overflow-x-auto rounded-lg shadow-md sm:rounded-lg ">
+                <CanvasJSChart options={category_chart_options} />
               </div>
-               <br></br>
+              <div style={chartContainerStyle}>
+                <div id="chartContainer">
+                  {/* The chart will be rendered inside this div */}
+                </div>
+              </div>
+
+            </div>
+
+            <br></br>
             {/* List of Data */}
-              <div className="grid col-1 bg-white  shadow-sm border-solid border-2  border-sky-500">
-                
-                
-              <div class="rounded relative overflow-x-auto shadow-md sm:rounded-lg bg-white   border-solid border-2">
-                  { selecttype==='Invoices' ?
-                  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                      <thead class="text-xs text-black uppercase bg-white dark:bg-white dark:text-black border-b border-gray-100">
-                          <tr>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Sno
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Branch
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Patient ID
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Patient Name
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Invoice No
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Invoice Date
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Amount
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Paid
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Status
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Details
-                              </th>
-                             
-                          </tr>
-                      </thead>
-                      <tbody>
-                          
-                          {tabledata1.map((item, index) => (
-                          <React.Fragment key={index}>
-                            <tr className='border-b border-gray-100 bg-white'>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{index+1}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.dates}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.total_amount}</td>
-                             
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.amount_paid}</td>
-                             
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">
-                              <button onClick={() => toggleDetails(item.id)}>
-                                {detailsVisible[item.id] ? 'Hide' : 'View'} Split-up
+            <div className="grid bg-white shadow-sm col-1 ">
+
+
+              <div className="relative overflow-x-auto rounded shadow-md sm:rounded-lg ">
+                {selecttype === 'Invoices' ?
+                  <table className="w-full text-sm text-left text-gray-500 ">
+                    <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
+                      <tr className=''>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Sno
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Branch
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Patient ID
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Patient Name
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Invoice No
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Invoice Date
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Amount
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Paid
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Status
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Details
+                        </th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {tabledata1.map((item, index) => (
+                        <React.Fragment key={index}>
+                          <tr className='bg-white border-b border-gray-100 even:bg-[#F5FCCD] odd:bg-[#78D6C6]'>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.dates}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.total_amount}</td>
+
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount_paid}</td>
+
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">
+                              <button className="bg-[#3d708f] hover:bg-[#255e7e] text-white font-bold py-2 px-4 rounded" onClick={() => toggleDetails(item.id)}>
+                                {detailsVisible[item.id] ? 'Hide' : 'View'}
                               </button>
-                              </td>
-                            </tr>
-                            {detailsVisible[item.id] && (
-                              <tr class="">
-                               
-                               <td colspan="10" className=''>
-                                <div class="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 ">
-                
-                                  <div class="col-span-1  bg-white text-center font-semibold text-black">Sno</div>
-                                  <div class="col-span-1   bg-white text-center font-semibold text-black">Branch Name</div>
-                                  <div class="col-span-1   bg-white text-center font-semibold text-black">Schedule Date</div>
-                                  <div class="col-span-1   bg-white text-center font-semibold text-black">Service Name</div>
-                                  <div class="col-span-1  bg-white text-center font-semibold text-black">Amount</div>
-                                  
+                            </td>
+                          </tr>
+                          {detailsVisible[item.id] && (
+                            <tr className="">
+
+                              <td className=''>
+                                <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1] ">
+
+                                  <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Sno</div>
+                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Branch Name</div>
+                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Schedule Date</div>
+                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Service Name</div>
+                                  <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Amount</div>
+
                                 </div>
                                 {splitup[item.id] && splitup[item.id].map((item, index) => (
-                                <div class="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
-                
-                                  <div class="col-span-1  bg-white text-center font-normal text-black">{index + 1}</div>
-                                  <div class="col-span-1   bg-white text-center font-normal text-black">{item.branch_name}</div>
-                                  <div class="col-span-1   bg-white text-center font-normal text-black">{item.schedule_date}</div>
-                                  <div class="col-span-1   bg-white text-center font-normal text-black">{item.service_name}</div>
-                                  <div class="col-span-1  bg-white text-center font-normal text-black">{item.amount}</div>
-                                  
-                                </div>
-                                 ))}
-                                
-                              
-                                    
-                              
-                                
-                               </td>
-                               
-                              </tr>
-                              
-                               
-                              
-                            )}
+                                  <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
 
-                          
-                          </React.Fragment>
-                        ))}
-                      </tbody>
-                  </table>
-                   :
-                   <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                      <thead class="text-xs text-black uppercase bg-white dark:bg-white dark:text-black border-b border-gray-100">
-                          <tr>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Sno
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Branch
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Patient ID
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Patient Name
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Service Name
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Invoice No
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Service Date
-                              </th>
-                              <th scope="col" class="px-6 py-3 font-semibold">
-                                  Amount
-                              </th>
-                              
-                             
-                          </tr>
-                      </thead>
-                      <tbody>
-                          
-                          {tabledata2.map((item, index) => (
-                          <React.Fragment key={index}>
-                            <tr className='border-b border-gray-100 bg-white'>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{index+1}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.patient_name}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
-                             
-                              <td class="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
-                             
-                      
+                                    <div className="col-span-1 font-normal text-center text-black bg-white">{index + 1}</div>
+                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.branch_name}</div>
+                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.schedule_date}</div>
+                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.service_name}</div>
+                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.amount}</div>
+
+                                  </div>
+                                ))}
+                              </td>
                             </tr>
-                            {/* {detailsVisible[index] && (
-                              <tr class="border-b border-gray-100 bg-white">
-                                <th scope="col" class="px-6 py-3 font-semibold">
-                                  Sno
-                                </th>
-                                <th scope="col" class="px-6 py-3 font-semibold">
-                                    Invoice Date
-                                </th>
-                                <th scope="col" class="px-6 py-3 font-semibold">
-                                    Patient Name
-                                </th>
-                                <th scope="col" class="px-6 py-3 font-semibold">
-                                    Amount
-                                </th>
-                              </tr>
-                            )} */}
+                          )}
 
-                           
-                          </React.Fragment>
-                        ))}
-                      </tbody>
+
+                        </React.Fragment>
+                      ))}
+                    </tbody>
                   </table>
-                  }
+                  :
+                  <table className="w-full text-sm text-left text-gray-500 ">
+                    <thead className="text-xs text-white uppercase border-b border-gray-100 bg-[#053B50] ">
+                      <tr className='border-b border-gray-100 '>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Sno
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold ">
+                          Branch
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold ">
+                          Patient ID
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Patient Name
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Service Name
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Invoice No
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Service Date
+                        </th>
+                        <th scope="col" className="px-6 py-3 font-semibold">
+                          Amount
+                        </th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {tabledata2.map((item, index) => (
+                        <React.Fragment key={index}>
+                          <tr className=' border-b border-gray-100 even:bg-[#EEEEEE] odd:bg-[#64CCC5]'>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_name}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
+
+                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+
+
+                          </tr>
+
+
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                  </table>
+                }
               </div>
 
 
-              </div>
-
-              
-
+            </div>
           </main>
-          <footer class="col-span-7 p-10 bg-green-300 border-2 border-sky-500">
-            <h1 class="text-center text-2xl">Footer</h1>
+          <footer className="col-span-7 p-2 bg-white border-2 ">
+            <div className="">
+              <div className="container flex flex-col flex-wrap px-5 py-4 mx-auto sm:flex-row">
+                <p className="text-sm text-center text-black sm:text-left">Copyright © {(new Date().getFullYear())} All rights reserved
+
+                </p>
+                <span className="inline-flex justify-center mt-2 text-black sm:ml-auto sm:mt-0 sm:justify-start">
+                  Athulya Senior Care
+                </span>
+              </div>
+            </div>
           </footer>
         </div>
-      
-        
-         
-      
-        
-        
-       
       </div>
-
-      {/* <div className="grid lg:grid-cols-5 gap-5 mb-16 border-solid border-2  border-sky-500">
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500">
-          
-        </div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-10 shadow-sm border-solid border-2  border-sky-500"></div>
-      </div>
-      <div className="grid lg:grid-cols-3 gap-5 mb-16 border-solid border-2  border-sky-500">
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
-      </div>
-      <div className="grid lg:grid-cols-2 gap-5 mb-16 border-solid border-2  border-sky-500">
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
-        <div className="rounded bg-white h-40 shadow-sm border-solid border-2  border-sky-500"></div>
-      </div>
-      <div className="grid col-1 bg-white h-96 shadow-sm border-solid border-2  border-sky-500"></div> */}
-
-
     </div>
   );
 }
