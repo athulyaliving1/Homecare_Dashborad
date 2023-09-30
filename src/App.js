@@ -25,6 +25,8 @@ function App() {
   const [tabledata1, settabledata1] = useState([]);
   const [tabledata2, settabledata2] = useState([]);
   const [alldaydata, setalldaydata] = useState([]);
+  const [tabledata3, settabledata3] = useState([]);
+  const [tabledata4, settabledata4] = useState([]);
   const [selecttype, setselecttype] = useState('Invoices');
   const [splitup, setSplitup] = useState({});
   const [masterservices, setMasterservices] = useState([]);
@@ -32,7 +34,10 @@ function App() {
   // const [getpendingschedules, setGetpendingschedules] = useState([]);
   // const [selectedServices, setSelectedServices] = useState([]);
   const [piechartdata, setPiechartdata] = useState([]);
+  // const [showTableData2, setShowTableData2] = useState(false);
 
+  console.log(tabledata3);
+  console.log(tabledata1);
 
 
 
@@ -59,6 +64,10 @@ function App() {
     height: "100%",
     margin: "auto"
   };
+
+
+  let tableContent;
+
 
   //-----------------------------------------------------------------Branch Data Fetching----------------------------------------------------------------
 
@@ -278,16 +287,66 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    axios.post(`${URLDevelopment}/getcompletedschedules?from_date=${from_Date}&to_date=${to_Date}&branch_id=${select_branch}`)
+    const branchIdParam = select_branch !== undefined ? select_branch : '';
+
+    axios.post(`${URLDevelopment}/getcompletedschedules?from_date=${from_Date}&to_date=${to_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);
-        settabledata1(response.data.success);
+        setselecttype("completedschedules")
+        settabledata3(response.data.success);
         console.log(response.data.success);
       })
       .catch(error => {
         console.error('Error fetching data: ', error);
       });
   }
+
+
+  const pendingSchedules = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    from_Date = !(fromDate) ? today : from_Date;
+    to_Date = !(toDate) ? today : to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    const select_branch = branch.id;
+
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+
+    const branchIdParam = select_branch !== undefined ? select_branch : '';
+
+    axios.post(`${URLDevelopment}/getpendingschedules?from_date=${from_Date}&to_date=${to_Date}&branch_id=${branchIdParam}`)
+      .then(response => {
+        //setData(response.data);
+        setselecttype("pendingschedules")
+        settabledata4(response.data.success);
+
+        console.log(response.data.success);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+  }
+
 
 
 
@@ -602,6 +661,268 @@ function App() {
   };
 
 
+  if (selecttype === 'Invoices') {
+    tableContent = (
+      <table className="w-full text-sm text-left text-gray-500 ">
+        <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
+          <tr className=''>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Sno
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Branch
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Patient ID
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Patient Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Invoice No
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Invoice Date
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Amount
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Paid
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Status
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Details
+            </th>
+
+          </tr>
+        </thead>
+        <tbody>
+
+          {tabledata1.map((item, index) => (
+            <React.Fragment key={index}>
+              <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50'>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.dates}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.total_amount}</td>
+
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount_paid}</td>
+
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">
+                  <button className="bg-[#3d708f] hover:bg-[#255e7e] text-white font-bold py-2 px-4 rounded" onClick={() => toggleDetails(item.id)}>
+                    {detailsVisible[item.id] ? 'Hide' : 'View'}
+                  </button>
+                </td>
+              </tr>
+              {detailsVisible[item.id] && (
+                <tr className="">
+
+                  <td colSpan="10" className=''>
+                    <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1] ">
+
+                      <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Sno</div>
+                      <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Branch Name</div>
+                      <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Schedule Date</div>
+                      <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Service Name</div>
+                      <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Amount</div>
+
+                    </div>
+                    {splitup[item.id] && splitup[item.id].map((item, index) => (
+                      <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
+
+                        <div className="col-span-1 font-normal text-center text-black bg-white">{index + 1}</div>
+                        <div className="col-span-1 font-normal text-center text-black bg-white">{item.branch_name}</div>
+                        <div className="col-span-1 font-normal text-center text-black bg-white">{item.schedule_date}</div>
+                        <div className="col-span-1 font-normal text-center text-black bg-white">{item.service_name}</div>
+                        <div className="col-span-1 font-normal text-center text-black bg-white">{item.amount}</div>
+
+                      </div>
+                    ))}
+                  </td>
+                </tr>
+              )}
+
+
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+    );
+  } else if (selecttype === 'completedschedules') {
+    tableContent = (
+      <table className="w-full text-sm text-left text-gray-500">
+        <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
+          <tr className=''>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              First Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Branch
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Service Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Schedule Date
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Membership Type
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Assigned Task
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Amount
+            </th>
+
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Status
+            </th>
+
+
+          </tr>
+        </thead>
+        {/* Render Table 3 JSX */}
+        {tabledata3.map((item, index) => (
+          <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
+
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.assigned_tasks}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
+
+
+          </tr>
+        ))}
+      </table>
+    );
+  }
+  else if (selecttype === 'pendingschedules') {
+    tableContent = (
+      <table className="w-full text-sm text-left text-gray-500">
+        <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
+          <tr className=''>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              First Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Branch
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Service Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Schedule Date
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Membership Type
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Assigned Task
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Amount
+            </th>
+
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Status
+            </th>
+
+
+          </tr>
+        </thead>
+        {/* Render Table 3 JSX */}
+        {tabledata4.map((item, index) => (
+          <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
+
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.assigned_tasks}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+            <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
+
+
+          </tr>
+        ))}
+      </table>
+    );
+  }
+  else {
+    tableContent = (
+      <table className="w-full text-sm text-left text-gray-500 ">
+        <thead className="text-xs text-white uppercase border-b border-gray-100 bg-[#053B50] ">
+          <tr className='border-b border-gray-100 '>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Sno
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold ">
+              Branch
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold ">
+              Patient ID
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Patient Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Service Name
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Invoice No
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Service Date
+            </th>
+            <th scope="col" className="px-6 py-3 font-semibold">
+              Amount
+            </th>
+
+
+          </tr>
+        </thead>
+        <tbody>
+
+          {tabledata2.map((item, index) => (
+            <React.Fragment key={index}>
+              <tr className=' border-b border-gray-100 even:bg-[#EEEEEE] odd:bg-[#64CCC5]'>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_name}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+              </tr>
+            </React.Fragment>
+          ))}
+
+
+        </tbody>
+      </table>
+    );
+  }
+
+
+
+
+
+
+
 
   return (
     <div className="App">
@@ -766,6 +1087,7 @@ function App() {
                         <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
                       </div>
                       <div className="flex-1 text-right md:text-center">
+
                         <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
                         <p className="text-3xl font-bold">{completedschedulesamount}</p>
                       </div>
@@ -796,7 +1118,7 @@ function App() {
                         <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
                       </div>
                       <div className="flex-1 text-right md:text-center" >
-                        <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingreceipts}>Pending Schedules</h2>
+                        <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingSchedules}>Pending Schedules</h2>
                         <p className="text-3xl font-bold">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
                       </div>
                     </div>
@@ -815,10 +1137,10 @@ function App() {
             </div>
             <br></br>
             <div className="grid grid-cols-1 shadow-sm container-fluid lg:grid-cols-2">
-              <div className="relative overflow-x-auto rounded-lg shadow-md sm:rounded-lg ">
+              <div className="relative overflow-x-auto text-xl font-semibold rounded-lg shadow-md sm:rounded-lg">
                 <CanvasJSChart options={category_chart_options} />
               </div>
-              <div style={chartContainerStyle}>
+              <div style={chartContainerStyle} className='text-xl font-semibold'>
                 <div id="chartContainer">
                   {/* The chart will be rendered inside this div */}
                 </div>
@@ -829,154 +1151,10 @@ function App() {
             <br></br>
             {/* List of Data */}
             <div className="grid bg-white shadow-sm col-1 ">
-
-
               <div className="relative overflow-x-auto rounded shadow-md sm:rounded-lg ">
-                {selecttype === 'Invoices' ?
-                  <table className="w-full text-sm text-left text-gray-500 ">
-                    <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
-                      <tr className=''>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Sno
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Branch
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Patient ID
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Patient Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Invoice No
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Invoice Date
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Amount
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Paid
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Status
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Details
-                        </th>
 
-                      </tr>
-                    </thead>
-                    <tbody>
+                {tableContent}
 
-                      {tabledata1.map((item, index) => (
-                        <React.Fragment key={index}>
-                          <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50'>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.dates}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.total_amount}</td>
-
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount_paid}</td>
-
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">
-                              <button className="bg-[#3d708f] hover:bg-[#255e7e] text-white font-bold py-2 px-4 rounded" onClick={() => toggleDetails(item.id)}>
-                                {detailsVisible[item.id] ? 'Hide' : 'View'}
-                              </button>
-                            </td>
-                          </tr>
-                          {detailsVisible[item.id] && (
-                            <tr className="">
-
-                              <td colSpan="10" className=''>
-                                <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1] ">
-
-                                  <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Sno</div>
-                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Branch Name</div>
-                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Schedule Date</div>
-                                  <div className="col-span-1   bg-[#5383a1] text-center font-semibold text-white">Service Name</div>
-                                  <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Amount</div>
-
-                                </div>
-                                {splitup[item.id] && splitup[item.id].map((item, index) => (
-                                  <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
-
-                                    <div className="col-span-1 font-normal text-center text-black bg-white">{index + 1}</div>
-                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.branch_name}</div>
-                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.schedule_date}</div>
-                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.service_name}</div>
-                                    <div className="col-span-1 font-normal text-center text-black bg-white">{item.amount}</div>
-
-                                  </div>
-                                ))}
-                              </td>
-                            </tr>
-                          )}
-
-
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                  :
-                  <table className="w-full text-sm text-left text-gray-500 ">
-                    <thead className="text-xs text-white uppercase border-b border-gray-100 bg-[#053B50] ">
-                      <tr className='border-b border-gray-100 '>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Sno
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold ">
-                          Branch
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold ">
-                          Patient ID
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Patient Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Service Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Invoice No
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Service Date
-                        </th>
-                        <th scope="col" className="px-6 py-3 font-semibold">
-                          Amount
-                        </th>
-
-
-                      </tr>
-                    </thead>
-                    <tbody>
-
-                      {tabledata2.map((item, index) => (
-                        <React.Fragment key={index}>
-                          <tr className=' border-b border-gray-100 even:bg-[#EEEEEE] odd:bg-[#64CCC5]'>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_id}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.patient_name}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
-                            <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
-                          </tr>
-
-
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                }
               </div>
 
 
