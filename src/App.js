@@ -10,7 +10,6 @@ import { URLDevelopment } from "./utilities/Url.js";
 import axios from 'axios';
 function App() {
 
-
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [branch, setBranch] = useState('');
@@ -18,24 +17,34 @@ function App() {
   const [receiptamount, setreceipamount] = useState(0);
   const [completedschedulesamount, setcompletedschedulesamount] = useState(0);
   const [pendingscheduleamount, setpendingschedulesamount] = useState(0);
+
+  const [completedserviceschedulesamount, setcompletedserviceschedulesamount] = useState(0);
+  const [pendingservicescheduleamount, setpendingserviceschedulesamount] = useState(0);
+  
+
   const [estimatedamount, setestimatedamount] = useState(0);
   const [remainingamount, setremainingamount] = useState(0);
 
   const [servicecategory, setservicecategory] = useState([]);
+  
+  
   const [tabledata1, settabledata1] = useState([]);
   const [tabledata2, settabledata2] = useState([]);
   const [alldaydata, setalldaydata] = useState([]);
   const [tabledata3, settabledata3] = useState([]);
   const [tabledata4, settabledata4] = useState([]);
+  const [tabledata5, settabledata5] = useState([]);
   const [selecttype, setselecttype] = useState('Invoices');
   const [splitup, setSplitup] = useState({});
-  const [masterservices, setMasterservices] = useState([]);
+  //const [masterservices, setMasterservices] = useState([]);
+  const [mastercategories, setMastercategories] = useState([]);
   // const [getcompletedschedules, setGetcompletedschedules] = useState([]);
   // const [getpendingschedules, setGetpendingschedules] = useState([]);
   // const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
   const [piechartdata, setPiechartdata] = useState([]);
   // const [showTableData2, setShowTableData2] = useState(false);
-
+  const [firstbar, setfirstbar] = useState(true);
   console.log(tabledata3);
   console.log(tabledata1);
 
@@ -44,7 +53,8 @@ function App() {
 
   useEffect(() => {
     fetchData();
-    fetchMastersevices();
+    //fetchMastersevices();
+    fetchMastercategories();
     console.log(selecttype);
   }, []);
 
@@ -84,24 +94,49 @@ function App() {
 
   //---------------------------------------------------------------- Master Services data Fetching----------------------------------------------------------------
 
-  const fetchMastersevices = async () => {
-    try {
-      const response = await fetch(`${URLDevelopment}/getmasterservices`);
+  // hide masterservices
+
+  //const fetchMastersevices = async () => {
+   // try {
+      //const response = await fetch(`${URLDevelopment}/getmasterservices`);
+      //const data = await response.json();
+
+      //console.log(data);
+      // const masterserviceOption = data.map((service) => ({
+      //   value: service.service_name,
+      //   label: service.service_name
+      // }));
+      // console.log(masterserviceOption.value);
+
+      // setMasterservices(masterserviceOption);
+    // } catch (error) {
+    //   console.error("Error fetching countries:", error);
+    // }
+  //};
+
+  const fetchMastercategories = async () => {
+    
+    setMastercategories(0);
+    try{
+      
+      const response = await fetch(`http://localhost:4042/getmastercategories`);
       const data = await response.json();
 
-      console.log(data);
-      const masterserviceOption = data.map((service) => ({
-        value: service.service_name,
-        label: service.service_name
+      const mastercategoryOption = data.map((category) => ({
+        id:category.id,
+        value: category.category_name,
+        label: category.category_name
       }));
-      console.log(masterserviceOption.value);
+      console.log("seeema");
+      //const newItem = { id: -1, value: 'All', label: 'All' ,selected: true};
+      const all_Categories=mastercategoryOption;
+      console.log(all_Categories);
+      setMastercategories(all_Categories);
 
-      setMasterservices(masterserviceOption);
-    } catch (error) {
+    }catch(error){
       console.error("Error fetching countries:", error);
     }
   };
-
 
   const handleFromDate = (date) => {
     setFromDate(date);
@@ -112,6 +147,11 @@ function App() {
   }
   const handleToDate = (date) => {
     setToDate(date);
+  }
+
+  const handleCategory = (category) => {
+    setSelectedCategory(category);
+    
   }
 
   const handleDataPointClick = (dataPoint) => {
@@ -352,6 +392,9 @@ function App() {
 
   const fetchData = () => {
 
+    setfirstbar(true);
+
+    
     const from_Date = fromDate ? new Date(fromDate) : new Date();
 
     // Convert fromDate to the required format
@@ -371,14 +414,80 @@ function App() {
 
     // Rest of your code for API calls using Axios...
 
+
     console.log('From Date:', formattedFrom_Date);
     console.log('To Date:', formattedTo_Date);
     console.log('Branch ID:', branch.id);
+    console.log('Category: ',mastercategories);
+    console.log('Selected Category',selectedCategory.id);
+    console.log('Hide/Show: ',firstbar);
     var select_branch = branch.id;
+    var select_category=selectedCategory.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    //console.log(from_Date);
+    //console.log(to_Date);
+    //console.log(select_branch);
+    //console.log(select_category);
+    if(!select_category)
+    {
+      console.log("Not Selected");
+      setfirstbar(false);
+
+    }else{
+
+      const branchIdParam = select_branch !== undefined ? select_branch : '';
+     
+      console.log("Service Params:-"+formattedFrom_Date+" "+formattedTo_Date+" "+branchIdParam+" "+select_category);
+      // Completed  and Pending Service Schedules
+      axios.post(`http://localhost:4042/getschedulesummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}&category_required=${select_category}`)
+      .then(response => {
+        //setData(response.data);formattedTo_Date
+        //console.log("Rohit");
+        //console.log(response.data.data['Completed_Schedules']);
+        var completed_service_schedules=response.data.data['Completed_Schedules'];
+        var pending_service_schedules=response.data.data['Pending_Schedules'];
+
+        let rupeeIndian = Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        });
+        completed_service_schedules = rupeeIndian.format(completed_service_schedules);
+        pending_service_schedules = rupeeIndian.format(pending_service_schedules);
+        
+        setcompletedserviceschedulesamount(completed_service_schedules);
+        setpendingserviceschedulesamount(pending_service_schedules);
+        
+        //console.log(servicecategory);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+      // Category Schedules
+
+      axios.post(`http://localhost:4042/getschedulecategoryrevenue?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}&category_required=${select_category}`)
+      .then(response => {
+        //setData(response.data);formattedTo_Date
+        console.log("Category Service Schedules");
+        console.log(response.data.data);
+        setservicecategory(response.data.data);
+        //console.log(servicecategory);
+      })
+
+      axios.post(`http://localhost:4042/getschedulerevenue?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}&category_required=${select_category}`)
+      .then(response => {
+        //setData(response.data);
+        settabledata5(response.data.data);
+        
+      })
+     
+
+
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+    }
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
@@ -395,11 +504,24 @@ function App() {
       });
 
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    firstbar==false ?
+
     axios.post(`${URLDevelopment}/getserviceinvoice?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
         //setData(response.data);formattedTo_Date
         setservicecategory(response.data.data);
         //console.log(response.data.data);
+        console.log(response.data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      })
+      :
+      axios.post(`http://localhost:4042/getschedulecategoryrevenue?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}&category_required=${select_category}`)
+      .then(response => {
+        //setData(response.data);formattedTo_Date
+        setservicecategory(response.data.data);
+        console.log("Deepthi");
         console.log(servicecategory);
       })
       .catch(error => {
@@ -533,11 +655,12 @@ function App() {
 
   };
 
+  
   const category_chart_options = {
     animationEnabled: true,
     theme: "light2",
     title: {
-      text: "Invoices Created Based on Category"
+      text: (firstbar==false)?"Invoices Created Based on Category":"Service Revenue Based on Category"
     },
     axisX: {
       title: "Category",
@@ -550,7 +673,7 @@ function App() {
     },
     data: [{
       type: "bar",
-      dataPoints: servicecategory,
+      dataPoints: (firstbar==false)?servicecategory:servicecategory,
       click: (e) => {
         const dataPoint = e.dataPoint;
         handleDataPointClick(dataPoint);
@@ -577,6 +700,7 @@ function App() {
   // const handleMasterChange = (e) => {
   //   setSelectedServices(e.target.value);
   // }
+
 
 
 
@@ -660,8 +784,11 @@ function App() {
     height: "400px"
   };
 
+  if(firstbar==false)
+  
+  {
 
-  if (selecttype === 'Invoices') {
+  if (selecttype === 'Invoices' ) {
     tableContent = (
       <table className="w-full text-sm text-left text-gray-500 ">
         <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
@@ -752,6 +879,8 @@ function App() {
 
             </React.Fragment>
           ))}
+
+          
         </tbody>
       </table>
     );
@@ -917,11 +1046,59 @@ function App() {
     );
   }
 
+ }else{
 
+  tableContent = (
+    <table className="w-full text-sm text-left text-gray-500 ">
+      <thead className="text-xs text-white uppercase    border-b border-gray-100 bg-[#003f5c] ">
+        <tr className=''>
+          <th scope="col" className="px-6 py-3 font-semibold">
+            Sno
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           First Name
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           Branch Name
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           Schedule Date
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           Category Name
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           Service Name
+          </th>
+          <th scope="col" className="px-6 py-3 font-semibold">
+           Amount
+          </th>
 
+        </tr>
+      </thead>
+      <tbody>
 
+        {tabledata5.map((item, index) => (
+          <React.Fragment key={index}>
+            <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50'>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{index + 1}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.full_name}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.category_name}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
+              <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
 
+            </tr>
+          </React.Fragment>
+        ))}
 
+        
+      </tbody>
+    </table>
+    );
+ 
+  }
 
 
   return (
@@ -1014,14 +1191,23 @@ function App() {
               <div className='h-10 rounded shadow-sm'>
 
 
-                <Select
+                {/* <Select
                   options={masterservices}
                   name="masterservices"
                   className="h-10 rounded shadow-sm"
                   placeholder="Select services"
                 // onChange={handleMasterChange}
+                /> */}
 
+               <Select
+                  options={mastercategories}
+                  name="mastercategories"
+                  className="h-10 rounded shadow-sm"
+                  placeholder="Select services"
+                 onChange={handleCategory}
+                
                 />
+                
               </div>
 
               <div className="h-10 rounded shadow-sm ">
@@ -1034,21 +1220,28 @@ function App() {
 
             <div>
               <div className="flex flex-wrap">
+                
+                {!firstbar && (
+
                 <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
-                  <div className="p-5 border-b-4 rounded-lg shadow-xl border-green-600/80 bg-gradient-to-b from-green-50 to-green-100">
-                    <div className="flex flex-row items-center">
-                      <div className="flex-shrink pr-4">
-                        <div className="p-5 rounded-full bg-green-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
-                      </div>
-                      <div className="flex-1 text-right md:text-center">
-                        <h2 className="font-bold text-gray-600 uppercase">Invoices</h2>
-                        <p className="text-3xl font-bold">{invoiceamount} <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
-                      </div>
+                <div className="p-5 border-b-4 rounded-lg shadow-xl border-green-600/80 bg-gradient-to-b from-green-50 to-green-100">
+                  <div className="flex flex-row items-center">
+                    <div className="flex-shrink pr-4">
+                      <div className="p-5 rounded-full bg-green-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
+                    </div>
+                    <div className="flex-1 text-right md:text-center">
+                      <h2 className="font-bold text-gray-600 uppercase">Invoices</h2>
+                      <p className="text-3xl font-bold">{invoiceamount} <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
                     </div>
                   </div>
+                </div>
 
                 </div>
+                
+                ) }
+               
+               {!firstbar && (
                 <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
                   <div className="p-5 border-b-4 rounded-lg shadow-xl border-pink-500/80 bg-gradient-to-b from-pink-50 to-pink-100">
@@ -1064,6 +1257,8 @@ function App() {
                   </div>
 
                 </div>
+               )}
+                {!firstbar && (
                 <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
                   <div className="p-5 border-b-4 rounded-lg shadow-xl border-yellow-600/80 bg-gradient-to-b from-yellow-50 to-yellow-100">
@@ -1079,6 +1274,9 @@ function App() {
                   </div>
 
                 </div>
+                )}
+                
+                {!firstbar &&(
                 <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
                   <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
@@ -1095,7 +1293,50 @@ function App() {
                   </div>
 
                 </div>
-                <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                )}
+                
+                {/* Service Completed Schedules */}
+
+                {firstbar &&(
+                <div className="w-full p-6 md:w-1/2 xl:w-1/2">
+
+                  <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center">
+
+                        <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
+                        <p className="text-3xl font-bold">{completedserviceschedulesamount}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                )} 
+
+                {/* Service Pending Schedules */}
+               {firstbar &&(
+
+                <div className="w-full p-6 md:w-1/2 xl:w-1/2">
+
+                  <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
+                    <div className="flex flex-row items-center">
+                      <div className="flex-shrink pr-4">
+                        <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
+                      </div>
+                      <div className="flex-1 text-right md:text-center" >
+                        <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={completedschedules}>Pending Schedules</h2>
+                        <p className="text-3xl font-bold">{pendingservicescheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                )}
+                {!firstbar &&(
+
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
                   <div className="p-5 border-b-4 rounded-lg shadow-xl border-indigo-500/80 bg-gradient-to-b from-indigo-50 to-indigo-100">
                     <div className="flex flex-row items-center">
@@ -1109,7 +1350,11 @@ function App() {
                     </div>
                   </div>
 
-                </div>
+                  </div>
+
+                )}
+                
+                {!firstbar &&(
                 <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
                   <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
@@ -1125,9 +1370,12 @@ function App() {
                   </div>
 
                 </div>
+                )}
+
               </div>
             </div>
 
+            {!firstbar && (
 
             <div className="grid shadow-sm col-2 h-96 ">
               <div className="relative overflow-x-auto bg-white border-2 border-solid rounded shadow-md sm:rounded-lg">
@@ -1135,10 +1383,14 @@ function App() {
               </div>
 
             </div>
+            )}
+            
             <br></br>
             <div className="grid grid-cols-1 shadow-sm container-fluid lg:grid-cols-2">
               <div className="relative overflow-x-auto text-xl font-semibold rounded-lg shadow-md sm:rounded-lg">
+                
                 <CanvasJSChart options={category_chart_options} />
+              
               </div>
               <div style={chartContainerStyle} className='text-xl font-semibold'>
                 <div id="chartContainer">
