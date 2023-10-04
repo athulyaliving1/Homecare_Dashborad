@@ -41,6 +41,9 @@ function App() {
   // const [showTableData2, setShowTableData2] = useState(false);
   const [firstbar, setfirstbar] = useState(true);
   const [detailsVisible, setDetailsVisible] = useState((false));
+  const [Revenue, setRevenue] = useState([]);
+  const [gross, setGross] = useState([]);
+  const [tax, setTax] = useState([]);
 
 
   // console.log(tabledata3);
@@ -218,15 +221,13 @@ function App() {
 
   //------ Change Indian Rupees Formatt---------------------------------------------
   const addSymbols = (e) => {
-    var suffixes = ["", "K", "M", "B"];
+    var suffixes = ["", "K", "Lakh", "Crore"];
     var order = Math.max(Math.floor(Math.log(Math.abs(e.value)) / Math.log(1000)), 0);
     if (order > suffixes.length - 1)
       order = suffixes.length - 1;
     var suffix = suffixes[order];
     return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
   };
-
-
 
 
 
@@ -608,17 +609,31 @@ function App() {
         var completedschedules_amount = response.data.data['Completed_Schedule_Sum'];
         var remaining_amount = invoice_amount - receipt_amount;
         var estimated_sum = invoice_amount + completedschedules_amount;
+
+
         var pendingschedule_amount = response.data.data['Pending_Schedules_Sum'];
         let rupeeIndian = Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
         });
+
+        setRevenue(invoice_amount + completedschedules_amount + pendingschedule_amount)
+        setGross((invoice_amount + completedschedules_amount + pendingschedule_amount) / (1.18));
+        setTax((invoice_amount + completedschedules_amount + pendingschedule_amount) - (invoice_amount + completedschedules_amount + pendingschedule_amount) / (1.18));
+
+
         invoice_amount = rupeeIndian.format(invoice_amount);
+        invoice_amount = invoice_amount.split('.')[0];
         receipt_amount = rupeeIndian.format(receipt_amount);
+        receipt_amount = receipt_amount.split('.')[0];
         remaining_amount = rupeeIndian.format(remaining_amount);
+        remaining_amount = remaining_amount.split('.')[0];
         completedschedules_amount = rupeeIndian.format(completedschedules_amount);
+        completedschedules_amount = completedschedules_amount.split('.')[0];
         pendingschedule_amount = rupeeIndian.format(pendingschedule_amount);
+        pendingschedule_amount = pendingschedule_amount.split('.')[0];
         estimated_sum = rupeeIndian.format(estimated_sum);
+        estimated_sum = estimated_sum.split('.')[0];
 
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
@@ -635,20 +650,20 @@ function App() {
       });
   };
 
-
-
-
-
-
-
-
-
-
-
+  function formatCurrency(value) {
+    // Format the number as Indian Rupees (INR)
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(value).split('.')[0];
+  }
 
   const stock_chart_options = {
     title: {
-      text: "Invoices Generated"
+      text: "Invoices Generated",
+      fontSize: 22,
+      // fontStyle: "oblique",
+      fontFamily: "arial",
     },
     subtitles: [{
       text: "INR"
@@ -674,7 +689,18 @@ function App() {
         }
       },
       toolTip: {
-        shared: true
+        shared: true,
+        contentFormatter: function (e) {
+          let content = '';
+          e.entries.forEach(function (entry) {
+            if (entry.dataPoint.name) {
+              content += entry.dataPoint.name + ": " + formatCurrency(entry.dataPoint.y) + "<br>";
+            } else {
+              content += "Amount: " + formatCurrency(entry.dataPoint.y) + "<br>";
+            }
+          });
+          return content;
+        }
       },
       data: [{
         type: "splineArea",
@@ -699,8 +725,12 @@ function App() {
   const category_chart_options = {
     animationEnabled: true,
     theme: "light2",
+
     title: {
-      text: (firstbar == false) ? "Invoices Created Based on Category" : "Service Revenue Based on Category"
+      text: (firstbar == false) ? "Invoices Created Based on Category" : "Service Revenue Based on Category",
+      fontSize: 22,
+      // fontStyle: "oblique",
+      fontFamily: "arial",
     },
     axisX: {
       title: "Category",
@@ -721,9 +751,6 @@ function App() {
     }],
 
   }
-
-
-
 
 
 
@@ -790,7 +817,11 @@ function App() {
       exportEnabled: true,
       theme: "light",
       title: {
-        text: "Branch Wise Pie-Chart"
+        text: "Branch Wise Pie-Chart",
+        fontSize: 22,
+        // fontStyle: "oblique",
+        fontFamily: "arial",
+        fontWeight: "bold",
       },
       data: [{
         type: "pie",
@@ -869,10 +900,10 @@ function App() {
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.dates}</td>
-                  <td className="px-6 py-4 text-black whitespace-nowrap">{item.total_amount}</td>
 
-                  <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount_paid}</td>
+                  <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.total_amount).split('.')[0]}</td>
 
+                  <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount_paid).split('.')[0]}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">
                     <button className="bg-[#3d708f] hover:bg-[#255e7e] text-white font-bold py-2 px-4 rounded" onClick={() => toggleDetails(item.id)}>
@@ -893,17 +924,21 @@ function App() {
                         <div className="col-span-1  bg-[#5383a1] text-center font-semibold text-white">Amount</div>
 
                       </div>
-                      {splitup[item.id] && splitup[item.id].map((item, index) => (
-                        <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
+                      {splitup[item.id] && splitup[item.id].map((item, index) => {
+                        // Calculate the formatted date here
+                        const inputDate = new Date(item.schedule_date);
+                        const formattedDate = `${inputDate.getFullYear()}-${String(inputDate.getMonth() + 1).padStart(2, '0')}-${String(inputDate.getDate()).padStart(2, '0')}`;
 
-                          <div className="col-span-1 font-normal text-center text-black bg-white">{index + 1}</div>
-                          <div className="col-span-1 font-normal text-center text-black bg-white">{item.branch_name}</div>
-                          <div className="col-span-1 font-normal text-center text-black bg-white">{item.schedule_date}</div>
-                          <div className="col-span-1 font-normal text-center text-black bg-white">{item.service_name}</div>
-                          <div className="col-span-1 font-normal text-center text-black bg-white">{item.amount}</div>
-
-                        </div>
-                      ))}
+                        return (
+                          <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 " key={index}>
+                            <div className="col-span-1 font-normal text-center text-black bg-white">{index + 1}</div>
+                            <div className="col-span-1 font-normal text-center text-black bg-white">{item.branch_name}</div>
+                            <div className="col-span-1 font-normal text-center text-black bg-white">{formattedDate}</div>
+                            <div className="col-span-1 font-normal text-center text-black bg-white">{item.service_name}</div>
+                            <div className="col-span-1 font-normal text-center text-black bg-white">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</div>
+                          </div>
+                        );
+                      })}
                     </td>
                   </tr>
                 )}
@@ -957,6 +992,7 @@ function App() {
             const assignedTasks = assignedTasksArray.map((task) => task.task).join(', ');
 
 
+
             return (
               <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
@@ -965,7 +1001,8 @@ function App() {
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
+
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
               </tr>
             );
@@ -1017,14 +1054,13 @@ function App() {
 
             return (
               <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
-
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks1}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
               </tr>
             );
@@ -1083,7 +1119,7 @@ function App() {
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks1}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.status}</td>
               </tr>
             );
@@ -1136,7 +1172,7 @@ function App() {
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.invoice_no}</td>
                   <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_date}</td>
-                  <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+                  <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
                 </tr>
               </React.Fragment>
             ))}
@@ -1188,7 +1224,7 @@ function App() {
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.category_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.amount}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
 
               </tr>
             </React.Fragment>
@@ -1200,6 +1236,18 @@ function App() {
     );
 
   }
+
+
+
+  //--------------------- get revenue--------------------------------------------------
+
+
+
+
+
+
+
+
 
 
   return (
@@ -1320,6 +1368,70 @@ function App() {
 
             <div>
               <div className="flex flex-wrap">
+
+
+                {!firstbar && (
+
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#e76f51] bg-gradient-to-b from-[#e76f51]/10 to-[#e76f51]/30">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-[#e76f51]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2 className="font-bold text-gray-600 uppercase">Revenue</h2>
+                          <p className="text-3xl font-bold">  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Revenue).split('.')[0]}  <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                )}
+                {!firstbar && (
+
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#d4a373] bg-gradient-to-b from-[#d4a373]/10 to-[#d4a373]/30">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-[#d4a373]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2 className="font-bold text-gray-600 uppercase">Gross</h2>
+                          <p className="text-3xl font-bold"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(gross).split('.')[0]}    <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                )}
+                {!firstbar && (
+
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#6d6875] bg-gradient-to-b from-[#6d6875]/10 to-[#6d6875]/30">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-[#6d6875]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2 className="font-bold text-gray-600 uppercase">Tax</h2>
+                          <p className="text-3xl font-bold"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(tax).split('.')[0]}<span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                )}
+
+
 
                 {!firstbar && (
 
