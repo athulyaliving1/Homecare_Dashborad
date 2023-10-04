@@ -40,12 +40,20 @@ function App() {
   const [piechartCategory, setPiechartCategory] = useState([]);
   // const [showTableData2, setShowTableData2] = useState(false);
   const [firstbar, setfirstbar] = useState(true);
-  console.log(tabledata3);
-  console.log(tabledata1);
+  const [detailsVisible, setDetailsVisible] = useState((false));
 
-  console.log(piechartCategory);
-  console.log(piechartdata);
 
+  // console.log(tabledata3);
+  // console.log(tabledata1);
+
+  // console.log(piechartCategory);
+  // console.log(piechartdata);
+
+
+
+
+
+  //-----------------------------------------------------------------------------Current Date Data Fetching---------------------------------------------------------------- 
   useEffect(() => {
     fetchData();
     //fetchMastersevices();
@@ -68,6 +76,7 @@ function App() {
   };
 
 
+  //---Jsx Table Decalration-------------------------------------------------------------------------------------------------------------------------------------------------------------------
   let tableContent;
 
 
@@ -153,7 +162,7 @@ function App() {
   }
 
 
-
+  //------Service Category OnClick-- ---------------------------------------------------------------------------- -------------------------------------------------------------------------------               ------------------------------------------------------------------
 
 
   const handleDataPointClick = (dataPoint) => {
@@ -207,7 +216,7 @@ function App() {
 
   };
 
-
+  //------ Change Indian Rupees Formatt---------------------------------------------
   const addSymbols = (e) => {
     var suffixes = ["", "K", "M", "B"];
     var order = Math.max(Math.floor(Math.log(Math.abs(e.value)) / Math.log(1000)), 0);
@@ -217,6 +226,12 @@ function App() {
     return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
   };
 
+
+
+
+
+
+  /**---- View Receipt------------------------------------------------------------------------------ */
   const viewreceipts = () => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -258,6 +273,8 @@ function App() {
 
   }
 
+
+  //------------------------------------------------------- OnClick Pendingreceipts Schedules ----------------------------------------------------------------------
   const pendingreceipts = () => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -300,7 +317,7 @@ function App() {
   }
 
 
-
+  //------------------------------------------------ OnClick Completed Data  ----------------------------------------------------------------
 
   const completedschedules = () => {
     var today = new Date();
@@ -346,6 +363,8 @@ function App() {
   }
 
 
+
+  //--------------------------------------------------------- OnClick Pending Schedules ----------------------------------------------------------------------
   const pendingSchedules = () => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -393,6 +412,8 @@ function App() {
 
 
 
+
+  //---- Fetch Current Date and Branch Data Fetching-------------------------------------------------------------
 
   const fetchData = () => {
 
@@ -614,6 +635,17 @@ function App() {
       });
   };
 
+
+
+
+
+
+
+
+
+
+
+
   const stock_chart_options = {
     title: {
       text: "Invoices Generated"
@@ -662,6 +694,8 @@ function App() {
   };
 
 
+
+
   const category_chart_options = {
     animationEnabled: true,
     theme: "light2",
@@ -689,26 +723,14 @@ function App() {
   }
 
 
-  // const data = {
-  //   labels: ['Red', 'Blue', 'Yellow'],
-  //   datasets: [
-  //     {
-  //       data: [300, 50, 100],
-  //       backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-  //       hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-  //     },
-  //   ],
-  // };
-
-
-  const [detailsVisible, setDetailsVisible] = useState((false));
-
-  // const handleMasterChange = (e) => {
-  //   setSelectedServices(e.target.value);
-  // }
 
 
 
+
+
+
+
+  //---- Split-up Data Fetching-------------------------------------------------------------
 
   const toggleDetails = async (id) => {
     try {
@@ -791,8 +813,13 @@ function App() {
     height: "400px"
   };
 
+
+
+
+  //------ If Data  False, then Table is Displayed without service Data --------------------------------------------   
   if (firstbar == false) {
 
+    //-----Onclick to fetch Invoices Data---------------------------------------------------    
     if (selecttype === 'Invoices') {
       tableContent = (
         <table className="w-full text-sm text-left text-gray-500 ">
@@ -889,6 +916,7 @@ function App() {
           </tbody>
         </table>
       );
+      //----- Onclick to fetch Completed Data-------------------------------------------------------------
     } else if (selecttype === 'completedschedules') {
       tableContent = (
         <table className="w-full text-sm text-left text-gray-500">
@@ -946,6 +974,7 @@ function App() {
         </table>
       );
     }
+    //----- Onclick to fetch Pending Data-------------------------------------------------------------
     else if (selecttype === 'pendingschedules') {
       tableContent = (
         <table className="w-full text-sm text-left text-gray-500">
@@ -1003,6 +1032,8 @@ function App() {
         </table>
       );
     }
+
+
     else if (selecttype === 'getreceipts') {
       tableContent = (
         <table className="w-full text-sm text-left text-gray-500">
@@ -1403,6 +1434,7 @@ function App() {
 
                   </div>
                 )}
+
                 {!firstbar && (
 
                   <div className="w-full p-6 md:w-1/2 xl:w-1/3">
