@@ -87,7 +87,7 @@ function App() {
 
 
   const selectBranch = [
-    { id: -1, label: 'All', value: 'All' },
+    { id: -1, label: 'All', value: '' },
     { id: 1, label: 'Athulya Homecare Chennai', value: 'Athulya Homecare Chennai' },
     { id: 2, label: 'Athulya Homecare Bangalore', value: 'Athulya Homecare Bangalore' },
     { id: 3, label: 'Athulya Homecare Cochin', value: 'Athulya Homecare Cochin' },
@@ -684,6 +684,7 @@ function App() {
       },
       axisY: {
         title: "Income",
+        titleFontSize: 22, 
         crosshair: {
           enabled: true,
           snapToDataPoint: true,
@@ -1585,7 +1586,7 @@ function App() {
                   </div>
                 )}
 
-               
+
 
                 {/* Service Completed Schedules */}
 
@@ -1627,7 +1628,7 @@ function App() {
                   </div>
                 )}
 
-                
+
 
               </div>
             </div>
