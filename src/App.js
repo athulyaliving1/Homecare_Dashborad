@@ -1473,6 +1473,62 @@ function App() {
                 )}
 
 
+                {!firstbar && (
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+
+                          <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
+                          <p className="text-3xl font-bold">{completedschedulesamount}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+                {!firstbar && (
+
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-indigo-500/80 bg-gradient-to-b from-indigo-50 to-indigo-100">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-indigo-500/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M4 2v20l2-1l2 1l2-1l2 1l2-1l2 1l2-1l2 1V2l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1Z" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8m4 1V7" /></g></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Invoices+Completed Schedules</h2>
+                          <p className="text-3xl font-bold">{estimatedamount}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                )}
+
+                {!firstbar && (
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center" >
+                          <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingSchedules}>Pending Schedules</h2>
+                          <p className="text-3xl font-bold">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
 
                 {!firstbar && (
 
@@ -1529,24 +1585,7 @@ function App() {
                   </div>
                 )}
 
-                {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
-
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
-                      <div className="flex flex-row items-center">
-                        <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
-                        </div>
-                        <div className="flex-1 text-right md:text-center">
-
-                          <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
-                          <p className="text-3xl font-bold">{completedschedulesamount}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                )}
+               
 
                 {/* Service Completed Schedules */}
 
@@ -1588,43 +1627,7 @@ function App() {
                   </div>
                 )}
 
-                {!firstbar && (
-
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
-
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-indigo-500/80 bg-gradient-to-b from-indigo-50 to-indigo-100">
-                      <div className="flex flex-row items-center">
-                        <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-indigo-500/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M4 2v20l2-1l2 1l2-1l2 1l2-1l2 1l2-1l2 1V2l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1Z" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8m4 1V7" /></g></svg></div>
-                        </div>
-                        <div className="flex-1 text-right md:text-center">
-                          <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Invoices+Completed Schedules</h2>
-                          <p className="text-3xl font-bold">{estimatedamount}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-
-                )}
-
-                {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
-
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
-                      <div className="flex flex-row items-center">
-                        <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
-                        </div>
-                        <div className="flex-1 text-right md:text-center" >
-                          <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingSchedules}>Pending Schedules</h2>
-                          <p className="text-3xl font-bold">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                )}
+                
 
               </div>
             </div>
