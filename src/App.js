@@ -600,6 +600,8 @@ function App() {
     //   });
 
 
+    console.log(formattedFrom_Date, formattedTo_Date, branchIdParam);
+
 
     axios.post(`${URLDevelopment}/getsummary?from_date=${formattedFrom_Date}&to_date=${formattedTo_Date}&branch_id=${branchIdParam}`)
       .then(response => {
@@ -694,8 +696,10 @@ function App() {
           let content = '';
           e.entries.forEach(function (entry) {
             if (entry.dataPoint.name) {
+              content += entry.dataPoint.name + ": " + entry.dataPoint.label + "<br>";
               content += entry.dataPoint.name + ": " + formatCurrency(entry.dataPoint.y) + "<br>";
             } else {
+              content += "Date: " + entry.dataPoint.label + "<br>";
               content += "Amount: " + formatCurrency(entry.dataPoint.y) + "<br>";
             }
           });
@@ -740,6 +744,22 @@ function App() {
       title: "Income",
       includeZero: true,
       labelFormatter: addSymbols
+    },
+    toolTip: {
+      shared: true,
+      contentFormatter: function (e) {
+        let content = '';
+        e.entries.forEach(function (entry) {
+          if (entry.dataPoint.name) {
+            content += entry.dataPoint.name + ": " + entry.dataPoint.label + "<br>";
+            content += entry.dataPoint.name + ": " + formatCurrency(entry.dataPoint.y) + "<br>";
+          } else {
+            content += "Service Category: " + entry.dataPoint.label + "<br>";
+            content += "Amount: " + formatCurrency(entry.dataPoint.y) + "<br>";
+          }
+        });
+        return content;
+      }
     },
     data: [{
       type: "bar",
@@ -801,16 +821,23 @@ function App() {
 
   //--------------------------------Pie Charts Data Fetching-----------------------------------------  
   useEffect(() => {
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+      }).format(amount).split('.')[0];
+    };
+
     const dataPoints = firstbar === false
       ? piechartdata.map(item => ({
         y: item.total_amount_sum,
         label: item.branch_name,
-        yValueFormatString: "#,##0,###"
+        yValueFormatString: formatCurrency(item.total_amount_sum)
       }))
       : piechartCategory.map(item => ({
         y: item.total_amount_sum,
         label: item.branch_name,
-        yValueFormatString: "#,##0,###"
+        yValueFormatString: formatCurrency(item.total_amount_sum)
       }));
     const options = {
       animationEnabled: true,
@@ -818,14 +845,29 @@ function App() {
       theme: "light",
       title: {
         text: "Branch Wise Pie-Chart",
-        fontSize: 22,
-        // fontStyle: "oblique",
+        fontSize: 20,
         fontFamily: "arial",
-        fontWeight: "bold",
+        fontWeight: "bold"
+      },
+      toolTip: {
+        shared: true,
+        contentFormatter: function (e) {
+          let content = '';
+          e.entries.forEach(function (entry) {
+            if (entry.dataPoint.name) {
+              content += entry.dataPoint.name + ": " + entry.dataPoint.label + "<br>";
+              content += entry.dataPoint.name + ": " + formatCurrency(entry.dataPoint.y) + "<br>";
+            } else {
+              content += "Branch: " + entry.dataPoint.label + "<br>";
+              content += "Amount: " + formatCurrency(entry.dataPoint.y) + "<br>";
+            }
+          });
+          return content;
+        }
       },
       data: [{
         type: "pie",
-        indexLabel: "{label}: ₹{y}",
+        indexLabel: "{label}: {yValueFormatString}",
         startAngle: -180,
         dataPoints: dataPoints,
       }]
@@ -833,8 +875,7 @@ function App() {
 
     const chart = new CanvasJS.Chart("chartContainer", options);
     chart.render();
-  }, [firstbar, piechartdata, piechartCategory]); // piechartdata as a dependency
-  // Empty dependency array to run this effect only once
+  }, [firstbar, piechartdata, piechartCategory]);
 
 
   //--------------------------------------------------------------------------------------------PIE CHART Container ---------------------------------------------------
