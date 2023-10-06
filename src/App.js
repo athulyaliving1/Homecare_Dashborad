@@ -665,12 +665,13 @@ function App() {
       text: "Invoices Generated",
       fontSize: 22,
       // fontStyle: "oblique",
-      fontFamily: "arial",
+      fontFamily: "sans",
+      fontWeight: "bold",
     },
     subtitles: [{
       text: "INR"
     }],
-    theme: "light2",
+    theme: "light",
     animationEnabled: true,
     exportEnabled: true,
     charts: [{
@@ -684,7 +685,9 @@ function App() {
       },
       axisY: {
         title: "Income",
-        titleFontSize: 22, 
+        titleFontSize: 22,
+        titleFontFamily: "sans",
+        titleFontWeight: "bold",
         crosshair: {
           enabled: true,
           snapToDataPoint: true,
@@ -735,14 +738,20 @@ function App() {
       text: (firstbar == false) ? "Invoices Created Based on Category" : "Service Revenue Based on Category",
       fontSize: 22,
       // fontStyle: "oblique",
-      fontFamily: "arial",
+      fontFamily: "Sans",
     },
     axisX: {
       title: "Category",
+      titleFontFamily: "sans",
+      titleFontWeight: "bold",
+      titleFontSize: 22,
       reversed: true,
     },
     axisY: {
       title: "Income",
+      titleFontFamily: "sans",
+      titleFontWeight: "bold",
+      titleFontSize: 22,
       includeZero: true,
       labelFormatter: addSymbols
     },
@@ -846,8 +855,8 @@ function App() {
       theme: "light",
       title: {
         text: "Branch Wise Pie-Chart",
-        fontSize: 20,
-        fontFamily: "arial",
+        fontSize: 22,
+        fontFamily: "sans",
         fontWeight: "bold"
       },
       toolTip: {
@@ -1033,14 +1042,15 @@ function App() {
             const assignedTasksArray = JSON.parse(item.assigned_tasks);
             const assignedTasks = assignedTasksArray.map((task) => task.task).join(', ');
 
-
+            const inputDate = new Date(item.schedule_date);
+            const formattedDate = `${inputDate.getFullYear()}-${String(inputDate.getMonth() + 1).padStart(2, '0')}-${String(inputDate.getDate()).padStart(2, '0')}`;
 
             return (
               <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{formattedDate}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
@@ -1092,14 +1102,15 @@ function App() {
           {tabledata4.map((item, index) => {
             const assignedTasksArray1 = JSON.parse(item.assigned_tasks);
             const assignedTasks1 = assignedTasksArray1.map((task) => task.task).join(', ');
-
+            const inputDate = new Date(item.schedule_date);
+            const formattedDate = `${inputDate.getFullYear()}-${String(inputDate.getMonth() + 1).padStart(2, '0')}-${String(inputDate.getDate()).padStart(2, '0')}`;
 
             return (
               <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{formattedDate}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks1}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
@@ -1150,7 +1161,8 @@ function App() {
           {tabledata4.map((item, index) => {
             const assignedTasksArray1 = JSON.parse(item.assigned_tasks);
             const assignedTasks1 = assignedTasksArray1.map((task) => task.task).join(', ');
-
+            const inputDate = new Date(item.schedule_date);
+            const formattedDate = `${inputDate.getFullYear()}-${String(inputDate.getMonth() + 1).padStart(2, '0')}-${String(inputDate.getDate()).padStart(2, '0')}`;
 
             return (
               <tr className='bg-white border-b border-gray-100 even:bg-[#839B97]/50 odd:bg-[#CFD3CE]/50' key={index}>
@@ -1158,7 +1170,7 @@ function App() {
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.first_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.branch_name}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.service_name}</td>
-                <td className="px-6 py-4 text-black whitespace-nowrap">{item.schedule_date}</td>
+                <td className="px-6 py-4 text-black whitespace-nowrap">{formattedDate}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{item.membership_type}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{assignedTasks1}</td>
                 <td className="px-6 py-4 text-black whitespace-nowrap">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(item.amount).split('.')[0]}</td>
@@ -1323,10 +1335,25 @@ function App() {
         */}
 
 
-
+        <nav
+          className="relative flex flex-wrap items-center justify-between w-full py-2 shadow-lg bg-bahama-blue-800 text-neutral-500 hover:text-neutral-700 focus:text-neutral-700 lg:py-4">
+          <div className="flex flex-wrap items-center justify-between w-full px-3">
+            <div>
+              <div
+                className="flex items-center my-1 mx-14 text-neutral-900 hover:text-neutral-900 focus:text-neutral-900 lg:mb-0 lg:mt-0"
+              >
+                <img
+                  src="https://www.athulyahomecare.com/lp/ophthalmology/Assest/logo.png"
+                  className='w-2/3 bg-white rounded-md h-2/3'
+                  alt="TE Logo"
+                  loading="lazy" />
+              </div>
+            </div>
+          </div>
+        </nav>
 
         <div className='col-span-7 grid grid-cols-7  bg-[#F3F4F6] border-solid border-2  '>
-          <header className="col-span-7 h-16 bg-[#F3F4F6] border-solid border-2  ">
+          {/*  <header className="col-span-7 h-16 bg-[#F3F4F6] border-solid border-2  ">
 
             <div className="container flex justify-between h-16 mx-auto">
               <img
@@ -1342,6 +1369,8 @@ function App() {
               </button>
             </div>
           </header>
+          
+      */}
 
 
           {/* Replace border-2  with border-0 border-white-500  */}
@@ -1401,7 +1430,7 @@ function App() {
               </div>
 
               <div className="h-10 rounded shadow-sm ">
-                <button className=" hover:bg-[#003f5c] text-white font-semibold hover:text-white h-full w-full bg-[#3d708f] border  hover:border-transparent rounded" onClick={fetchData}>
+                <button className="w-full h-full font-semibold text-white border rounded bg-gradient-to-r from-bahama-blue-600 to-bahama-blue-800 hover:bg-gradient-to-r hover:from-bahama-blue-800 hover:to-bahama-blue-600 hover:text-white hover:border-transparent" onClick={fetchData}>
                   Filter
                 </button>
               </div>
@@ -1414,16 +1443,16 @@ function App() {
 
                 {!firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#e76f51] bg-gradient-to-b from-[#e76f51]/10 to-[#e76f51]/30">
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#e76f51] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-[#e76f51]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" fillRule="evenodd" d="M12.052 1.25h-.104c-.899 0-1.648 0-2.242.08c-.628.084-1.195.27-1.65.725c-.456.456-.642 1.023-.726 1.65c-.057.427-.074 1.446-.078 2.32c-2.022.067-3.237.303-4.08 1.147C2 8.343 2 10.229 2 14c0 3.771 0 5.657 1.172 6.828C4.343 22 6.229 22 10 22h4c3.771 0 5.657 0 6.828-1.172C22 19.657 22 17.771 22 14c0-3.771 0-5.657-1.172-6.828c-.843-.844-2.058-1.08-4.08-1.146c-.004-.875-.02-1.894-.078-2.32c-.084-.628-.27-1.195-.726-1.65c-.455-.456-1.022-.642-1.65-.726c-.594-.08-1.344-.08-2.242-.08Zm3.196 4.752c-.005-.847-.019-1.758-.064-2.097c-.063-.461-.17-.659-.3-.789c-.13-.13-.328-.237-.79-.3c-.482-.064-1.13-.066-2.094-.066s-1.612.002-2.095.067c-.461.062-.659.169-.789.3c-.13.13-.237.327-.3.788c-.045.34-.06 1.25-.064 2.097C9.143 6 9.56 6 10 6h4c.441 0 .857 0 1.248.002ZM12 9.25a.75.75 0 0 1 .75.75v.01c1.089.274 2 1.133 2 2.323a.75.75 0 0 1-1.5 0c0-.384-.426-.916-1.25-.916c-.824 0-1.25.532-1.25.916s.426.917 1.25.917c1.385 0 2.75.96 2.75 2.417c0 1.19-.911 2.048-2 2.323V18a.75.75 0 0 1-1.5 0v-.01c-1.089-.274-2-1.133-2-2.323a.75.75 0 0 1 1.5 0c0 .384.426.916 1.25.916c.824 0 1.25-.532 1.25-.916s-.426-.917-1.25-.917c-1.385 0-2.75-.96-2.75-2.417c0-1.19.911-2.049 2-2.323V10a.75.75 0 0 1 .75-.75Z" clipRule="evenodd"/></svg></div>
+                          <div className="p-5 rounded-full bg-[#e76f51]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" fillRule="evenodd" d="M12.052 1.25h-.104c-.899 0-1.648 0-2.242.08c-.628.084-1.195.27-1.65.725c-.456.456-.642 1.023-.726 1.65c-.057.427-.074 1.446-.078 2.32c-2.022.067-3.237.303-4.08 1.147C2 8.343 2 10.229 2 14c0 3.771 0 5.657 1.172 6.828C4.343 22 6.229 22 10 22h4c3.771 0 5.657 0 6.828-1.172C22 19.657 22 17.771 22 14c0-3.771 0-5.657-1.172-6.828c-.843-.844-2.058-1.08-4.08-1.146c-.004-.875-.02-1.894-.078-2.32c-.084-.628-.27-1.195-.726-1.65c-.455-.456-1.022-.642-1.65-.726c-.594-.08-1.344-.08-2.242-.08Zm3.196 4.752c-.005-.847-.019-1.758-.064-2.097c-.063-.461-.17-.659-.3-.789c-.13-.13-.328-.237-.79-.3c-.482-.064-1.13-.066-2.094-.066s-1.612.002-2.095.067c-.461.062-.659.169-.789.3c-.13.13-.237.327-.3.788c-.045.34-.06 1.25-.064 2.097C9.143 6 9.56 6 10 6h4c.441 0 .857 0 1.248.002ZM12 9.25a.75.75 0 0 1 .75.75v.01c1.089.274 2 1.133 2 2.323a.75.75 0 0 1-1.5 0c0-.384-.426-.916-1.25-.916c-.824 0-1.25.532-1.25.916s.426.917 1.25.917c1.385 0 2.75.96 2.75 2.417c0 1.19-.911 2.048-2 2.323V18a.75.75 0 0 1-1.5 0v-.01c-1.089-.274-2-1.133-2-2.323a.75.75 0 0 1 1.5 0c0 .384.426.916 1.25.916c.824 0 1.25-.532 1.25-.916s-.426-.917-1.25-.917c-1.385 0-2.75-.96-2.75-2.417c0-1.19.911-2.049 2-2.323V10a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
-                          <h2 className="font-bold text-gray-600 uppercase">Revenue</h2>
-                          <p className="text-3xl font-bold">  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Revenue).split('.')[0]}  <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                          <h2 className="font-sans font-semibold text-gray-600 uppercase">Revenue</h2>
+                          <p className="font-sans text-2xl font-semibold">  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Revenue).split('.')[0]}  <span className="text-green-500"></span></p>
                         </div>
                       </div>
                     </div>
@@ -1434,16 +1463,16 @@ function App() {
                 )}
                 {!firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#d4a373] bg-gradient-to-b from-[#d4a373]/10 to-[#d4a373]/30">
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#d4a373] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-[#d4a373]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 384 512"><path fill="#ffff" d="M64 0C28.7 0 0 28.7 0 64v384c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zm192 0v128h128L256 0zM64 80c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm128 72c8.8 0 16 7.2 16 16v17.3c8.5 1.2 16.7 3.1 24.1 5.1c8.5 2.3 13.6 11 11.3 19.6s-11 13.6-19.6 11.3c-11.1-3-22-5.2-32.1-5.3c-8.4-.1-17.4 1.8-23.6 5.5c-5.7 3.4-8.1 7.3-8.1 12.8c0 3.7 1.3 6.5 7.3 10.1c6.9 4.1 16.6 7.1 29.2 10.9l.5.1c11.3 3.4 25.3 7.6 36.3 14.6c12.1 7.6 22.4 19.7 22.7 38.2c.3 19.3-9.6 33.3-22.9 41.6c-7.7 4.8-16.4 7.6-25.1 9.1V440c0 8.8-7.2 16-16 16s-16-7.2-16-16v-17.8c-11.2-2.1-21.7-5.7-30.9-8.9c-2.1-.7-4.2-1.4-6.2-2.1c-8.4-2.8-12.9-11.9-10.1-20.2s11.9-12.9 20.2-10.1c2.5.8 4.8 1.6 7.1 2.4c13.6 4.6 24.6 8.4 36.3 8.7c9.1.3 17.9-1.7 23.7-5.3c5.1-3.2 7.9-7.3 7.8-14c-.1-4.6-1.8-7.8-7.7-11.6c-6.8-4.3-16.5-7.4-29-11.2l-1.6-.5c-11-3.3-24.3-7.3-34.8-13.7c-12-7.2-22.6-18.9-22.7-37.3c-.1-19.4 10.8-32.8 23.8-40.5c7.5-4.4 15.8-7.2 24.1-8.7V232c0-8.8 7.2-16 16-16z"/></svg></div>
+                          <div className="p-5 rounded-full bg-[#d4a373]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 384 512"><path fill="#ffff" d="M64 0C28.7 0 0 28.7 0 64v384c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zm192 0v128h128L256 0zM64 80c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm128 72c8.8 0 16 7.2 16 16v17.3c8.5 1.2 16.7 3.1 24.1 5.1c8.5 2.3 13.6 11 11.3 19.6s-11 13.6-19.6 11.3c-11.1-3-22-5.2-32.1-5.3c-8.4-.1-17.4 1.8-23.6 5.5c-5.7 3.4-8.1 7.3-8.1 12.8c0 3.7 1.3 6.5 7.3 10.1c6.9 4.1 16.6 7.1 29.2 10.9l.5.1c11.3 3.4 25.3 7.6 36.3 14.6c12.1 7.6 22.4 19.7 22.7 38.2c.3 19.3-9.6 33.3-22.9 41.6c-7.7 4.8-16.4 7.6-25.1 9.1V440c0 8.8-7.2 16-16 16s-16-7.2-16-16v-17.8c-11.2-2.1-21.7-5.7-30.9-8.9c-2.1-.7-4.2-1.4-6.2-2.1c-8.4-2.8-12.9-11.9-10.1-20.2s11.9-12.9 20.2-10.1c2.5.8 4.8 1.6 7.1 2.4c13.6 4.6 24.6 8.4 36.3 8.7c9.1.3 17.9-1.7 23.7-5.3c5.1-3.2 7.9-7.3 7.8-14c-.1-4.6-1.8-7.8-7.7-11.6c-6.8-4.3-16.5-7.4-29-11.2l-1.6-.5c-11-3.3-24.3-7.3-34.8-13.7c-12-7.2-22.6-18.9-22.7-37.3c-.1-19.4 10.8-32.8 23.8-40.5c7.5-4.4 15.8-7.2 24.1-8.7V232c0-8.8 7.2-16 16-16z" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
-                          <h2 className="font-bold text-gray-600 uppercase">Gross</h2>
-                          <p className="text-3xl font-bold"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(gross).split('.')[0]}    <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                          <h2 className="font-sans font-bold text-gray-600 uppercase">Gross</h2>
+                          <p className="text-2xl font-bold font-Roboto"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(gross).split('.')[0]}    <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1454,16 +1483,16 @@ function App() {
                 )}
                 {!firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#6d6875] bg-gradient-to-b from-[#6d6875]/10 to-[#6d6875]/30">
+                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#6d6875] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-[#6d6875]"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
-                          <h2 className="font-bold text-gray-600 uppercase">Tax</h2>
-                          <p className="text-3xl font-bold"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(tax).split('.')[0]}<span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                          <h2 className="font-sans font-bold text-gray-600 uppercase">Tax</h2>
+                          <p className="text-2xl font-bold font-Roboto"> {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(tax).split('.')[0]}<span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1475,9 +1504,9 @@ function App() {
 
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-blue-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
@@ -1485,7 +1514,7 @@ function App() {
                         <div className="flex-1 text-right md:text-center">
 
                           <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
-                          <p className="text-3xl font-bold">{completedschedulesamount}</p>
+                          <p className="text-2xl font-bold font-Roboto">{completedschedulesamount}</p>
                         </div>
                       </div>
                     </div>
@@ -1495,16 +1524,16 @@ function App() {
 
                 {!firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-indigo-500/80 bg-gradient-to-b from-indigo-50 to-indigo-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-indigo-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-indigo-500/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M4 2v20l2-1l2 1l2-1l2 1l2-1l2 1l2-1l2 1V2l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1l-2 1l-2-1Z" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8m4 1V7" /></g></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Invoices+Completed Schedules</h2>
-                          <p className="text-3xl font-bold">{estimatedamount}</p>
+                          <p className="text-2xl font-bold font-Roboto">{estimatedamount}</p>
                         </div>
                       </div>
                     </div>
@@ -1514,16 +1543,16 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-red-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center" >
                           <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={pendingSchedules}>Pending Schedules</h2>
-                          <p className="text-3xl font-bold">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
+                          <p className="text-2xl font-bold font-Roboto">{pendingscheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1533,16 +1562,16 @@ function App() {
 
                 {!firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-green-600/80 bg-gradient-to-b from-green-50 to-green-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-green-600/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-green-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#ffff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 7h1m-1 6h6m-2 4h2" /></g></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 className="font-bold text-gray-600 uppercase">Invoices</h2>
-                          <p className="text-3xl font-bold">{invoiceamount} <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
+                          <p className="text-2xl font-bold font-Roboto">{invoiceamount} <span className="text-green-500"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1552,16 +1581,16 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-pink-500/80 bg-gradient-to-b from-pink-50 to-pink-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-pink-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-pink-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M3 5.25A2.25 2.25 0 0 1 5.25 3h9.5A2.25 2.25 0 0 1 17 5.25V14h4v3.75A3.25 3.25 0 0 1 17.75 21H6.25A3.25 3.25 0 0 1 3 17.75V5.25ZM17 19.5h.75a1.75 1.75 0 0 0 1.75-1.75V15.5H17v4ZM6.5 7.75c0 .414.336.75.75.75h5.5a.75.75 0 0 0 0-1.5h-5.5a.75.75 0 0 0-.75.75ZM7.25 11a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-5.5Zm-.75 4.75c0 .414.336.75.75.75h3a.75.75 0 0 0 0-1.5h-3a.75.75 0 0 0-.75.75Z" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 style={cursorstyle} onClick={viewreceipts} className="font-bold text-gray-600 uppercase">Receipts</h2>
-                          <p className="text-3xl font-bold">{receiptamount}<span className="text-pink-500"><i className="fas fa-exchange-alt"></i></span></p>
+                          <p className="text-2xl font-bold font-Roboto">{receiptamount}<span className="text-pink-500"><i className="fas fa-exchange-alt"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1569,16 +1598,16 @@ function App() {
                   </div>
                 )}
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-yellow-600/80 bg-gradient-to-b from-yellow-50 to-yellow-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-yellow-600/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-yellow-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 20 20"><path fill="#ffff" fillRule="evenodd" d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0A2.213 2.213 0 0 1 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344l-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344l-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Zm4.822 4.997a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 0 0 1.004-1.114L8.704 8.75h1.921a1.875 1.875 0 0 1 0 3.75a.75.75 0 0 0 0 1.5a3.375 3.375 0 1 0 0-6.75h-1.92l1.047-.943Z" clipRule="evenodd" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 style={cursorstyle} onClick={pendingreceipts} className="font-bold text-gray-600 uppercase">Remaining</h2>
-                          <p className="text-3xl font-bold">{remainingamount} <span className="text-yellow-600"><i className="fas fa-caret-up"></i></span></p>
+                          <p className="text-2xl font-bold font-Roboto">{remainingamount} <span className="text-yellow-600"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
@@ -1591,9 +1620,9 @@ function App() {
                 {/* Service Completed Schedules */}
 
                 {firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/2">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-blue-500/80 bg-gradient-to-b from-blue-50 to-blue-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-blue-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-blue-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M13.26 20.74L12 22l-1.5-1.5L9 22l-1.5-1.5L6 22l-1.5-1.5L3 22V2l1.5 1.5L6 2l1.5 1.5L9 2l1.5 1.5L12 2l1.5 1.5L15 2l1.5 1.5L18 2l1.5 1.5L21 2v11.35c-.63-.22-1.3-.35-2-.35V5H5v14h8c0 .57.1 1.22.26 1.74M6 15v2h7.35c.26-.75.65-1.42 1.19-2H6m0-2h12v-2H6v2m0-4h12V7H6v2m17 8.23l-1.16-1.41l-3.59 3.59l-1.59-1.59L15.5 19l2.75 3" /></svg></div>
@@ -1601,7 +1630,7 @@ function App() {
                         <div className="flex-1 text-right md:text-center">
 
                           <h2 style={cursorstyle} onClick={completedschedules} className="font-bold text-gray-600 uppercase">Completed Schedules</h2>
-                          <p className="text-3xl font-bold">{completedserviceschedulesamount}</p>
+                          <p className="text-2xl font-bold font-Roboto">{completedserviceschedulesamount}</p>
                         </div>
                       </div>
                     </div>
@@ -1611,16 +1640,16 @@ function App() {
                 {/* Service Pending Schedules */}
                 {firstbar && (
 
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/2">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3 ">
 
-                    <div className="p-5 border-b-4 rounded-lg shadow-xl border-red-500/80 bg-gradient-to-b from-red-50 to-red-100">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-red-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
                           <div className="p-5 rounded-full bg-red-600/80"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="#ffff" d="M17 22q-2.075 0-3.538-1.463T12 17q0-2.075 1.463-3.538T17 12q2.075 0 3.538 1.463T22 17q0 2.075-1.463 3.538T17 22Zm.5-5.2v-2.3q0-.2-.15-.35T17 14q-.2 0-.35.15t-.15.35v2.275q0 .2.075.388t.225.337l1.525 1.525q.15.15.35.15t.35-.15q.15-.15.15-.35t-.15-.35L17.5 16.8ZM5 21q-.825 0-1.413-.588T3 19V5q0-.825.588-1.413T5 3h4.175q.275-.875 1.075-1.438T12 1q1 0 1.788.563T14.85 3H19q.825 0 1.413.588T21 5v6.25q-.45-.325-.95-.55T19 10.3V5h-2v2q0 .425-.288.713T16 8H8q-.425 0-.713-.288T7 7V5H5v14h5.3q.175.55.4 1.05t.55.95H5Zm7-16q.425 0 .713-.288T13 4q0-.425-.288-.713T12 3q-.425 0-.713.288T11 4q0 .425.288.713T12 5Z" /></svg></div>
                         </div>
                         <div className="flex-1 text-right md:text-center" >
                           <h2 className="font-bold text-gray-600 uppercase" style={cursorstyle} onClick={completedschedules}>Pending Schedules</h2>
-                          <p className="text-3xl font-bold">{pendingservicescheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
+                          <p className="text-2xl font-bold font-Roboto">{pendingservicescheduleamount} <span className="text-red-500"><i className="fas fa-caret-up"></i></span></p>
                         </div>
                       </div>
                     </div>
