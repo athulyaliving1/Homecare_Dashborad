@@ -12,7 +12,7 @@ import axios from "axios";
 function App() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [branch, setBranch] = useState("");
+  const [branch, setBranch] = useState({ id: null, label: "All", value: null });
   const [invoiceamount, setinvoiceamount] = useState(0);
   const [receiptamount, setreceipamount] = useState(0);
   const [completedschedulesamount, setcompletedschedulesamount] = useState(0);
@@ -48,8 +48,6 @@ function App() {
   const [gross, setGross] = useState([]);
   const [tax, setTax] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState({ id: null, label: "All", value: null });
-
 
   // console.log(tabledata3);
   // console.log(tabledata1);
@@ -110,14 +108,6 @@ function App() {
     },
   ];
 
-
-
-  const handleSelectChange = (event) => {
-    const selectedValue = event.target.value;
-    // Update the selected option based on the value
-    const newSelectedOption = selectBranch.find(option => option.value === selectedValue);
-    setSelectedOption(newSelectedOption);
-  };
 
 
 
@@ -182,9 +172,9 @@ function App() {
     setFromDate(date);
   };
 
-  // const handleBranch = (branch) => {
-  //   setBranch(branch);
-  // };
+  const handleBranch = (branch) => {
+    setBranch(branch);
+  };
   const handleToDate = (date) => {
     setToDate(date);
   };
@@ -394,7 +384,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    const branchIdParam = select_branch !== undefined ? select_branch : "";
+    const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -444,7 +434,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    const branchIdParam = select_branch !== undefined ? select_branch : "";
+    const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -508,7 +498,11 @@ function App() {
       console.log("Not Selected");
       setfirstbar(false);
     } else {
-      const branchIdParam = select_branch !== undefined ? select_branch : "";
+      const branchIdParam = select_branch !== null ? select_branch : "";
+
+
+
+
 
       console.log(
         "Service Params:-" +
@@ -593,7 +587,7 @@ function App() {
     //to_Date='2023-09-24';
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
-    const branchIdParam = select_branch !== undefined ? select_branch : "";
+    const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -2074,13 +2068,13 @@ function App() {
             {/* Filters */}
             <div className="grid gap-5 mb-16 lg:grid-cols-5 ">
               <div className="h-10 rounded shadow-sm">
-                <div>
-                  <select className="w-full px-2 border border-gray-300 rounded-md outline-none h-9" value={selectedOption.value} onChange={handleSelectChange}>
-                    {selectBranch.map(option => (
-                      <option key={option.id} value={option.value}>{option.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  options={selectBranch}
+                  name="branch_name"
+                  className="branch_name"
+                  placeholder="Select Branch"
+                  onChange={handleBranch}
+                />
               </div>
 
               <div className="w-full h-10 rounded shadow-sm ">
