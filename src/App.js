@@ -48,6 +48,8 @@ function App() {
   const [gross, setGross] = useState([]);
   const [tax, setTax] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState({ id: null, label: "All", value: null });
+
 
   // console.log(tabledata3);
   // console.log(tabledata1);
@@ -108,6 +110,14 @@ function App() {
     },
   ];
 
+
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    // Update the selected option based on the value
+    const newSelectedOption = selectBranch.find(option => option.value === selectedValue);
+    setSelectedOption(newSelectedOption);
+  };
 
 
 
@@ -384,7 +394,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    const branchIdParam = select_branch !== null ? select_branch : "";
+    const branchIdParam = select_branch !== undefined ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -434,7 +444,7 @@ function App() {
     console.log(to_Date);
     console.log(select_branch);
 
-    const branchIdParam = select_branch !== null ? select_branch : "";
+    const branchIdParam = select_branch !== undefined ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -480,25 +490,25 @@ function App() {
 
     // Rest of your code for API calls using Axios...
 
-    // console.log('From Date:', formattedFrom_Date);
-    // console.log('To Date:', formattedTo_Date);
-    // console.log('Branch ID:', branch.id);
-    // console.log('Category: ', mastercategories);
-    // console.log('Selected Category', selectedCategory.id);
-    // console.log('Hide/Show: ', firstbar);
+    console.log('From Date:', formattedFrom_Date);
+    console.log('To Date:', formattedTo_Date);
+    console.log('Branch ID:', branch.id);
+    console.log('Category: ', mastercategories);
+    console.log('Selected Category', selectedCategory.id);
+    console.log('Hide/Show: ', firstbar);
     var select_branch = branch.id;
     var select_category = selectedCategory.id;
 
-    //console.log(from_Date);
-    //console.log(to_Date);
-    //console.log(select_branch);
-    //console.log(select_category);
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+    console.log(select_category);
 
     if (!select_category) {
       console.log("Not Selected");
       setfirstbar(false);
     } else {
-      const branchIdParam = select_branch !== null ? select_branch : "";
+      const branchIdParam = select_branch !== undefined ? select_branch : "";
 
       console.log(
         "Service Params:-" +
@@ -583,7 +593,7 @@ function App() {
     //to_Date='2023-09-24';
     console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
-    const branchIdParam = select_branch !== null ? select_branch : "";
+    const branchIdParam = select_branch !== undefined ? select_branch : "";
     setIsLoading(true);
     axios
       .post(
@@ -2064,13 +2074,13 @@ function App() {
             {/* Filters */}
             <div className="grid gap-5 mb-16 lg:grid-cols-5 ">
               <div className="h-10 rounded shadow-sm">
-                <Select
-                  options={selectBranch}
-                  name="branch_name"
-                  className="branch_name"
-                  placeholder="Select Branch"
-                  onChange={handleBranch}
-                />
+                <div>
+                  <select className="w-full px-2 border border-gray-300 rounded-md outline-none h-9" value={selectedOption.value} onChange={handleSelectChange}>
+                    {selectBranch.map(option => (
+                      <option key={option.id} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="w-full h-10 rounded shadow-sm ">
