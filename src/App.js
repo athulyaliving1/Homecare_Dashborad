@@ -182,9 +182,9 @@ function App() {
     setFromDate(date);
   };
 
-  const handleBranch = (branch) => {
-    setBranch(branch);
-  };
+  // const handleBranch = (branch) => {
+  //   setBranch(branch);
+  // };
   const handleToDate = (date) => {
     setToDate(date);
   };
