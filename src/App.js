@@ -24,6 +24,7 @@ function App() {
   const [estimatedamount, setestimatedamount] = useState(0);
   const [remainingamount, setremainingamount] = useState(0);
   const [servicecategory, setservicecategory] = useState([]);
+  const [servicesubcategory, setservicesubcategory] = useState([]);
   const [tabledata1, settabledata1] = useState([]);
   const [tabledata2, settabledata2] = useState([]);
   const [alldaydata, setalldaydata] = useState([]);
@@ -79,7 +80,7 @@ function App() {
   //-----------------------------------------------------------------Branch Data Fetching----------------------------------------------------------------
 
   const selectBranch = [
-    { id: null, label: "All", value: null },
+    { id: null, label: "All", value: null },  // Add the "All" option as the first element
     {
       id: 1,
       label: "Athulya Homecare Chennai",
@@ -106,6 +107,9 @@ function App() {
       value: "Athulya Homecare Coimbatore",
     },
   ];
+
+
+
 
   // const selectBranch = [
   //   { id: -1, label: 'All', value: 'null' },
@@ -178,6 +182,12 @@ function App() {
   const handleCategory = (category) => {
     setSelectedCategory(category);
   };
+
+  const handleImageClick = () => {
+    // Reload the page/component
+    window.location.reload();
+  };
+
 
   //------Service Category OnClick-- ---------------------------------------------------------------------------- -------------------------------------------------------------------------------               ------------------------------------------------------------------
 
@@ -546,8 +556,8 @@ function App() {
         .then((response) => {
           //setData(response.data);formattedTo_Date
           console.log("Category Service Schedules");
-          setservicecategory(response.data.data);
-          console.log("setservicecategory1", response.data.data);
+          setservicesubcategory(response.data.data);
+          console.log("setservicesubcategory1", response.data.data);
         })
         .catch((error) => {
           console.error("Error fetching data: ", error);
@@ -898,7 +908,7 @@ function App() {
     data: [
       {
         type: "bar",
-        dataPoints: firstbar == false ? servicecategory : servicecategory,
+        dataPoints: firstbar == false ? servicecategory : servicesubcategory,
         click: (e) => {
           const dataPoint = e.dataPoint;
           handleDataPointClick(dataPoint);
@@ -1501,7 +1511,6 @@ function App() {
     },
   ];
 
-
   //-----chart onclick table header and body color---------------------------------------------------
   const tableCustomStyles1 = {
     headRow: {
@@ -1518,7 +1527,7 @@ function App() {
       },
       stripedStyle: {
         color: "NORMALCOLOR",
-        backgroundColor: "#64CCC5",
+        backgroundColor: "#f2fbfa",
       },
     },
   };
@@ -1557,8 +1566,6 @@ function App() {
     );
   };
 
-
-
   const columns5 = [
     {
       name: "S.NO",
@@ -1574,7 +1581,6 @@ function App() {
       selector: "full_name",
       sortable: true,
       width: "230px",
-
     },
     {
       name: "BRANCH NAME",
@@ -1582,11 +1588,21 @@ function App() {
       sortable: true,
       width: "270px",
     },
+
     {
       name: "SCHEDULE DATE",
       selector: "schedule_date",
       sortable: true,
-      width: "270px",
+      width: "150px",
+      cell: (row) => {
+        // Parse the date string into a Date object
+        const originalDate = new Date(row.schedule_date);
+
+        // Format the date as "YYYY-MM-DD"
+        const formattedDate = originalDate.toISOString().split("T")[0];
+
+        return formattedDate;
+      },
     },
     {
       name: "CATEGORY NAME",
@@ -1617,8 +1633,7 @@ function App() {
         </span>
       ),
     },
-  ]
-
+  ];
 
   const handleExportSelected5 = () => {
     const selectedDataToExport5 = selectedRows5.map((row, index) => ({
@@ -1651,26 +1666,21 @@ function App() {
     );
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   //------ If Data  False, then Table is Displayed without service Data --------------------------------------------
   if (firstbar == false) {
     //-----Onclick to fetch Invoices Data---------------------------------------------------
     if (selecttype === "Invoices") {
       tableContent = isLoading ? (
         // Step 2: Conditional rendering for the loading animation
-        <div>Loading...</div>
+        <div>
+          <div className="animate-pulse">
+            <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+            <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+            <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+            <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+            <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+          </div>
+        </div>
       ) : (
         <DataTable
           columns={columns1}
@@ -1768,7 +1778,13 @@ function App() {
     } else if (selecttype === "completedschedules") {
       tableContent = isLoading ? (
         // Step 2: Conditional rendering for the loading animation
-        <div>Loading...</div>
+        <div className="animate-pulse">
+          <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+        </div>
       ) : (
         <DataTable
           columns={columns2}
@@ -1795,7 +1811,13 @@ function App() {
     else if (selecttype === "pendingschedules") {
       tableContent = isLoading ? (
         // Step 2: Conditional rendering for the loading animation
-        <div>Loading...</div>
+        <div className="animate-pulse">
+          <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+        </div>
       ) : (
         <DataTable
           columns={columns3}
@@ -1907,7 +1929,13 @@ function App() {
     } else {
       tableContent = isLoading ? (
         // Step 2: Conditional rendering for the loading animation
-        <div>Loading...</div>
+        <div className="animate-pulse">
+          <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+        </div>
       ) : (
         <DataTable
           columns={columns4}
@@ -1933,7 +1961,13 @@ function App() {
   } else {
     tableContent = isLoading ? (
       // Step 2: Conditional rendering for the loading animation
-      <div>Loading...</div>
+      <div className="animate-pulse">
+        <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+        <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+        <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+        <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+        <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+      </div>
     ) : (
       <DataTable
         columns={columns5}
@@ -1951,7 +1985,6 @@ function App() {
           setCurrentPage5(page);
           setRowsPerPage5(rowsPerPage);
         }}
-
         striped
         customStyles={tableCustomStyles1}
       />
@@ -1992,12 +2025,14 @@ function App() {
         <nav className="relative flex flex-wrap items-center justify-between w-full py-2 shadow-lg bg-bahama-blue-800 text-neutral-500 hover:text-neutral-700 focus:text-neutral-700 lg:py-4">
           <div className="flex flex-wrap items-center justify-between w-full px-3">
             <div>
+
               <div className="flex items-center my-1 mx-14 text-neutral-900 hover:text-neutral-900 focus:text-neutral-900 lg:mb-0 lg:mt-0">
                 <img
                   src="https://www.athulyahomecare.com/lp/ophthalmology/Assest/logo.png"
                   className="w-2/3 bg-white rounded-md h-2/3"
                   alt="TE Logo"
                   loading="lazy"
+                  onClick={handleImageClick}
                 />
               </div>
             </div>
@@ -2028,7 +2063,7 @@ function App() {
           <main className="col-span-7 md:col-span-7  p-10 bg-[#F3F4F6] border-0 border-white-500">
             {/* Filters */}
             <div className="grid gap-5 mb-16 lg:grid-cols-5 ">
-              <div className="h-10 rounded shadow-sm ">
+              <div className="h-10 rounded shadow-sm">
                 <Select
                   options={selectBranch}
                   name="branch_name"
@@ -2114,7 +2149,14 @@ function App() {
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               new Intl.NumberFormat("en-IN", {
                                 style: "currency",
@@ -2157,7 +2199,14 @@ function App() {
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               new Intl.NumberFormat("en-IN", {
                                 style: "currency",
@@ -2208,7 +2257,14 @@ function App() {
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               new Intl.NumberFormat("en-IN", {
                                 style: "currency",
@@ -2257,7 +2313,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               completedschedulesamount
                             )}
@@ -2304,7 +2367,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               estimatedamount
                             )}
@@ -2345,7 +2415,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               pendingscheduleamount
                             )}{" "}
@@ -2391,7 +2468,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               invoiceamount
                             )}{" "}
@@ -2435,7 +2519,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               receiptamount
                             )}
@@ -2480,7 +2571,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               remainingamount
                             )}{" "}
@@ -2526,7 +2624,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               completedserviceschedulesamount
                             )}
@@ -2568,7 +2673,14 @@ function App() {
                           <p className="text-2xl font-bold font-Roboto">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
-                              <div>Loading...</div>
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
                             ) : (
                               pendingservicescheduleamount
                             )}{" "}
@@ -2589,7 +2701,19 @@ function App() {
                 <div className="relative overflow-x-auto bg-white border-2 border-solid rounded shadow-md sm:rounded-lg">
                   {isLoading ? (
                     // Step 2: Conditional rendering for the loading animation
-                    <div>Loading...</div>
+                    <div className="container animate-pulse">
+                      <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                      <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                    </div>
                   ) : (
                     <CanvasJSStockChart
                       containerProps={containerProps}
@@ -2605,7 +2729,45 @@ function App() {
               <div className="relative overflow-x-auto text-xl font-semibold rounded-lg shadow-md sm:rounded-lg">
                 {isLoading ? (
                   // Step 2: Conditional rendering for the loading animation
-                  <div>Loading...</div>
+                  <div className="grid grid-cols-2">
+
+                    <div
+                      role="status"
+                      className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 "
+                    >
+                      <div className="h-2.5 bg-gray-200 rounded-full "></div>
+                      <div className="w-48 h-2 mb-10 bg-gray-200 rounded-full "></div>
+                      <div className="flex items-baseline mt-4 space-x-6">
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full h-56 bg-gray-200 rounded-t-lg "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full h-64 bg-gray-200 rounded-t-lg "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-80 "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-80 "></div>
+                      </div>
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                    <div
+                      role="status"
+                      className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 "
+                    >
+                      <div className="h-2.5 bg-gray-200 rounded-full "></div>
+                      <div className="w-48 h-2 mb-10 bg-gray-200 rounded-full "></div>
+                      <div className="flex items-baseline mt-4 space-x-6">
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full h-56 bg-gray-200 rounded-t-lg "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full h-64 bg-gray-200 rounded-t-lg "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-80 "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-72 "></div>
+                        <div className="w-full bg-gray-200 rounded-t-lg h-80 "></div>
+                      </div>
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+
+
                 ) : (
                   <CanvasJSChart options={category_chart_options} />
                 )}
