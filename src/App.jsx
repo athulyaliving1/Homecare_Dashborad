@@ -48,6 +48,8 @@ function App() {
   const [gross, setGross] = useState([]);
   const [tax, setTax] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading2, setIsLoading2] = useState(false);
+
 
   // console.log(tabledata3);
   // console.log(tabledata1);
@@ -162,7 +164,7 @@ function App() {
       console.log(all_Categories);
       setMastercategories(all_Categories);
     } catch (error) {
-      console.error("Error fetching countries:", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -925,6 +927,8 @@ function App() {
 
   const toggleDetails = async (id) => {
     try {
+      setIsLoading2(true);
+
       const requestBody = {
         id: id,
       };
@@ -948,6 +952,9 @@ function App() {
       }));
     } catch (error) {
       console.error("Error fetching details from the API:", error);
+    } finally {
+      // Set loading back to false after the API call is completed
+      setIsLoading2(false);
     }
   };
 
@@ -1713,68 +1720,86 @@ function App() {
             });
           }}
           expandableRowsComponent={({ data }) => (
-            <div>
-              <div>
-                <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1]">
-                  <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                    Sno
-                  </div>
-                  <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                    Branch Name
-                  </div>
-                  <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                    Schedule Date
-                  </div>
-                  <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                    Service Name
-                  </div>
-                  <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                    Amount
-                  </div>
-                </div>
-                {splitup[data.id] &&
-                  splitup[data.id].map((item, index) => {
-                    // Calculate the formatted date here
-                    const inputDate = new Date(item.schedule_date);
-                    const formattedDate = `${inputDate.getFullYear()}-${String(
-                      inputDate.getMonth() + 1
-                    ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(
-                      2,
-                      "0"
-                    )}`;
 
-                    return (
-                      <div
-                        className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100"
-                        key={index}
-                      >
-                        <div className="col-span-1 font-normal text-center text-black ">
-                          {index + 1}
+            <div>
+              {isLoading2 ? (
+                <div className="animate-pulse">
+                  <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
+                  <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                  <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                  <div className="h-4 mb-6 bg-gray-300 rounded"></div>
+                  <div className="h-4 mb-6 bg-gray-200 rounded"></div>
+                </div>
+              ) : (<div>
+                <div>
+                  <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1]">
+                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                      Sno
+                    </div>
+                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                      Branch Name
+                    </div>
+                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                      Schedule Date
+                    </div>
+                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                      Service Name
+                    </div>
+                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                      Amount
+                    </div>
+                  </div>
+                  {splitup[data.id] &&
+                    splitup[data.id].map((item, index) => {
+                      // Calculate the formatted date here
+                      const inputDate = new Date(item.schedule_date);
+                      const formattedDate = `${inputDate.getFullYear()}-${String(
+                        inputDate.getMonth() + 1
+                      ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(
+                        2,
+                        "0"
+                      )}`;
+
+                      return (
+                        <div
+                          className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100"
+                          key={index}
+                        >
+                          <div className="col-span-1 font-normal text-center text-black ">
+                            {index + 1}
+                          </div>
+                          <div className="col-span-1 font-normal text-center text-black ">
+                            {item.branch_name}
+                          </div>
+                          <div className="col-span-1 font-normal text-center text-black ">
+                            {formattedDate}
+                          </div>
+                          <div className="col-span-1 font-normal text-center text-black ">
+                            {item.service_name}
+                          </div>
+                          <div className="col-span-1 font-normal text-center text-black ">
+                            {
+                              new Intl.NumberFormat("en-IN", {
+                                style: "currency",
+                                currency: "INR",
+                              })
+                                .format(item.amount)
+                                .split(".")[0]
+                            }
+                          </div>
                         </div>
-                        <div className="col-span-1 font-normal text-center text-black ">
-                          {item.branch_name}
-                        </div>
-                        <div className="col-span-1 font-normal text-center text-black ">
-                          {formattedDate}
-                        </div>
-                        <div className="col-span-1 font-normal text-center text-black ">
-                          {item.service_name}
-                        </div>
-                        <div className="col-span-1 font-normal text-center text-black ">
-                          {
-                            new Intl.NumberFormat("en-IN", {
-                              style: "currency",
-                              currency: "INR",
-                            })
-                              .format(item.amount)
-                              .split(".")[0]
-                          }
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
+                      );
+                    })}
+                </div>
+              </div>)
+
+
+              }
             </div>
+
+
+
+
           )}
         />
       );
@@ -2149,7 +2174,7 @@ function App() {
                           <h2 className="font-sans font-semibold text-gray-600 uppercase">
                             Revenue
                           </h2>
-                          <p className="font-sans text-2xl font-semibold">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2199,7 +2224,7 @@ function App() {
                           <h2 className="font-sans font-bold text-gray-600 uppercase">
                             Gross
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="xl:text-2xl font-bold font-Roboto">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2257,7 +2282,7 @@ function App() {
                           <h2 className="font-sans font-bold text-gray-600 uppercase">
                             Tax
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2314,7 +2339,7 @@ function App() {
                           >
                             Completed Schedules
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2368,7 +2393,7 @@ function App() {
                           >
                             Invoices+Completed Schedules
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2416,7 +2441,7 @@ function App() {
                           >
                             Pending Schedules
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2469,7 +2494,7 @@ function App() {
                           <h2 className="font-bold text-gray-600 uppercase">
                             Invoices
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2520,7 +2545,7 @@ function App() {
                           >
                             Receipts
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2572,7 +2597,7 @@ function App() {
                           >
                             Remaining
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2625,7 +2650,7 @@ function App() {
                           >
                             Completed Schedules
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2674,7 +2699,7 @@ function App() {
                           >
                             Pending Schedules
                           </h2>
-                          <p className="text-2xl font-bold font-Roboto">
+                          <p className="font-sans xl:text-2xl font-semibold">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
