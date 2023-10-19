@@ -524,8 +524,8 @@ function App() {
         )
         .then((response) => {
           //setData(response.data);formattedTo_Date
-          //console.log("Rohit");
-          //console.log(response.data.data['Completed_Schedules']);
+
+          console.log(response.data.data['Completed_Schedules']);
           var completed_service_schedules =
             response.data.data["Completed_Schedules"];
           var pending_service_schedules =
@@ -710,6 +710,7 @@ function App() {
       .then((response) => {
         //setData(response.data);
         console.log("branch null", branchIdParam);
+        console.log(response);
         var invoice_amount = response.data.data["Invoice_Sum"];
         var receipt_amount = response.data.data["Receipt_Sum"];
         var completedschedules_amount =
@@ -757,6 +758,14 @@ function App() {
         pendingschedule_amount = pendingschedule_amount.split(".")[0];
         estimated_sum = rupeeIndian.format(estimated_sum);
         estimated_sum = estimated_sum.split(".")[0];
+
+
+        console.log(invoice_amount)
+        console.log(completedschedules_amount)
+
+
+
+
 
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
@@ -913,7 +922,7 @@ function App() {
     },
     data: [
       {
-        type: "bar",
+        type: "pie",
         dataPoints: firstbar == false ? servicecategory : servicesubcategory,
         click: (e) => {
           const dataPoint = e.dataPoint;
@@ -1021,7 +1030,7 @@ function App() {
       },
       data: [
         {
-          type: "pie",
+          type: "bar",
           indexLabel: "{label}: {yValueFormatString}",
           startAngle: -180,
           dataPoints: dataPoints,
@@ -1719,6 +1728,7 @@ function App() {
               toggleDetails(item.id);
             });
           }}
+
           expandableRowsComponent={({ data }) => (
 
             <div>
@@ -2150,7 +2160,7 @@ function App() {
             <div>
               <div className="flex flex-wrap">
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#e76f51] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2172,9 +2182,9 @@ function App() {
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 className="font-sans font-semibold text-gray-600 uppercase">
-                            Revenue
+                            Gross
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2202,7 +2212,7 @@ function App() {
                   </div>
                 )}
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#d4a373] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2222,9 +2232,9 @@ function App() {
                         </div>
                         <div className="flex-1 text-right md:text-center">
                           <h2 className="font-sans font-bold text-gray-600 uppercase">
-                            Gross
+                            Revenue
                           </h2>
-                          <p className="xl:text-2xl font-bold font-Roboto">
+                          <p className="font-bold xl:text-2xl font-Roboto">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2254,7 +2264,7 @@ function App() {
                   </div>
                 )}
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 border-b-4 rounded-lg shadow-xl border-[#6d6875] bg-white">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2282,7 +2292,7 @@ function App() {
                           <h2 className="font-sans font-bold text-gray-600 uppercase">
                             Tax
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {" "}
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
@@ -2313,7 +2323,7 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-blue-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2339,7 +2349,7 @@ function App() {
                           >
                             Completed Schedules
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2361,7 +2371,7 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-indigo-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2393,7 +2403,7 @@ function App() {
                           >
                             Invoices+Completed Schedules
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2415,7 +2425,7 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-red-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2441,7 +2451,7 @@ function App() {
                           >
                             Pending Schedules
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2466,7 +2476,7 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-green-600/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2494,7 +2504,7 @@ function App() {
                           <h2 className="font-bold text-gray-600 uppercase">
                             Invoices
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2519,7 +2529,7 @@ function App() {
                 )}
 
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-pink-500/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2545,7 +2555,7 @@ function App() {
                           >
                             Receipts
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2569,7 +2579,7 @@ function App() {
                   </div>
                 )}
                 {!firstbar && (
-                  <div className="w-full p-6 md:w-1/2 xl:w-1/4">
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
                     <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-yellow-600/80">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
@@ -2597,7 +2607,7 @@ function App() {
                           >
                             Remaining
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2650,7 +2660,7 @@ function App() {
                           >
                             Completed Schedules
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
@@ -2699,7 +2709,7 @@ function App() {
                           >
                             Pending Schedules
                           </h2>
-                          <p className="font-sans xl:text-2xl font-semibold">
+                          <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
                               // Step 2: Conditional rendering for the loading animation
                               <div
