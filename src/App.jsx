@@ -7,6 +7,7 @@ import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { URLDevelopment } from "./utilities/Url.js";
 import DataTable from "react-data-table-component";
 import { CSVLink } from "react-csv";
+import LoadingSpinner from "./utilities/LoadingSpinner.js";
 
 import axios from "axios";
 function App() {
@@ -21,6 +22,7 @@ function App() {
     useState(0);
   const [pendingservicescheduleamount, setpendingserviceschedulesamount] =
     useState(0);
+  const [unallocated_amount, setunallocated_amount] = useState(0);
   const [estimatedamount, setestimatedamount] = useState(0);
   const [remainingamount, setremainingamount] = useState(0);
   const [servicecategory, setservicecategory] = useState([]);
@@ -31,6 +33,7 @@ function App() {
   const [tabledata3, settabledata3] = useState([]);
   const [tabledata4, settabledata4] = useState([]);
   const [tabledata5, settabledata5] = useState([]);
+  const [tabledata6, settabledata6] = useState([]);
   const [selecttype, setselecttype] = useState("Invoices");
   const [splitup, setSplitup] = useState({});
   //const [masterservices, setMasterservices] = useState([]);
@@ -50,9 +53,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
 
-
   // console.log(tabledata3);
-  // console.log(tabledata1);
+  console.log(tabledata6);
+  console.log(selecttype);
 
   // console.log(piechartCategory);
   // console.log(piechartdata);
@@ -82,7 +85,7 @@ function App() {
   //-----------------------------------------------------------------Branch Data Fetching----------------------------------------------------------------
 
   const selectBranch = [
-    { id: null, label: "All", value: null },  // Add the "All" option as the first element
+    { id: null, label: "All", value: null }, // Add the "All" option as the first element
     {
       id: 1,
       label: "Athulya Homecare Chennai",
@@ -109,9 +112,6 @@ function App() {
       value: "Athulya Homecare Coimbatore",
     },
   ];
-
-
-
 
   // const selectBranch = [
   //   { id: -1, label: 'All', value: 'null' },
@@ -189,7 +189,6 @@ function App() {
     // Reload the page/component
     window.location.reload();
   };
-
 
   //------Service Category OnClick-- ---------------------------------------------------------------------------- -------------------------------------------------------------------------------               ------------------------------------------------------------------
 
@@ -297,6 +296,7 @@ function App() {
       )
       .then((response) => {
         //setData(response.data);
+        setselecttype("receipts");
         settabledata1(response.data.data);
         console.log(response.data.data);
       })
@@ -457,6 +457,58 @@ function App() {
       });
   };
 
+  //--- Fetch Unallocated funds-------------------------------------------------------------------------------
+
+  const unallocatedFunds = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + "-" + mm + "-" + dd;
+    from_Date = !fromDate ? today : from_Date;
+    to_Date = !toDate ? today : to_Date;
+
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
+
+    from_Date = `${year}-${month}-${day}`;
+
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
+
+    to_Date = `${year}-${month}-${day}`;
+    const select_branch = branch.id;
+
+    console.log(from_Date);
+    console.log(to_Date);
+    console.log(select_branch);
+
+    const branchIdParam = select_branch !== null ? select_branch : "";
+    setIsLoading(true);
+    axios
+      .post(
+        `http://localhost:4042/getunapprovedfunds?from_date=${from_Date}&to_date=${to_Date}&branch_id=${branchIdParam}`
+      )
+      .then((response) => {
+        //setData(response.data);
+        setselecttype("unallocatedFunds");
+        settabledata6(response.data.data);
+
+        console.log(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   //---- Fetch Current Date and Branch Data Fetching-------------------------------------------------------------
 
   const fetchData = () => {
@@ -482,12 +534,12 @@ function App() {
 
     // Rest of your code for API calls using Axios...
 
-    console.log('From Date:', formattedFrom_Date);
-    console.log('To Date:', formattedTo_Date);
-    console.log('Branch ID:', branch.id);
-    console.log('Category: ', mastercategories);
-    console.log('Selected Category', selectedCategory.id);
-    console.log('Hide/Show: ', firstbar);
+    console.log("From Date:", formattedFrom_Date);
+    console.log("To Date:", formattedTo_Date);
+    console.log("Branch ID:", branch.id);
+    console.log("Category: ", mastercategories);
+    console.log("Selected Category", selectedCategory.id);
+    console.log("Hide/Show: ", firstbar);
     var select_branch = branch.id;
     var select_category = selectedCategory.id;
 
@@ -501,10 +553,6 @@ function App() {
       setfirstbar(false);
     } else {
       const branchIdParam = select_branch !== null ? select_branch : "";
-
-
-
-
 
       console.log(
         "Service Params:-" +
@@ -525,7 +573,7 @@ function App() {
         .then((response) => {
           //setData(response.data);formattedTo_Date
 
-          console.log(response.data.data['Completed_Schedules']);
+          console.log(response.data.data["Completed_Schedules"]);
           var completed_service_schedules =
             response.data.data["Completed_Schedules"];
           var pending_service_schedules =
@@ -710,13 +758,16 @@ function App() {
       .then((response) => {
         //setData(response.data);
         console.log("branch null", branchIdParam);
-        console.log(response);
+        console.log(response.data.data);
         var invoice_amount = response.data.data["Invoice_Sum"];
         var receipt_amount = response.data.data["Receipt_Sum"];
         var completedschedules_amount =
           response.data.data["Completed_Schedule_Sum"];
+        var unallocated_amount = response.data.data["Unapproved_Funds"];
         var remaining_amount = invoice_amount - receipt_amount;
         var estimated_sum = invoice_amount + completedschedules_amount;
+
+        console.log(unallocated_amount);
 
         var pendingschedule_amount =
           response.data.data["Pending_Schedules_Sum"];
@@ -758,14 +809,13 @@ function App() {
         pendingschedule_amount = pendingschedule_amount.split(".")[0];
         estimated_sum = rupeeIndian.format(estimated_sum);
         estimated_sum = estimated_sum.split(".")[0];
+        unallocated_amount = rupeeIndian.format(unallocated_amount);
+        unallocated_amount = unallocated_amount.split(".")[0];
 
+        console.log(unallocated_amount);
 
-        console.log(invoice_amount)
-        console.log(completedschedules_amount)
-
-
-
-
+        console.log(invoice_amount);
+        console.log(completedschedules_amount);
 
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
@@ -773,6 +823,7 @@ function App() {
         setcompletedschedulesamount(completedschedules_amount);
         setestimatedamount(estimated_sum);
         setpendingschedulesamount(pendingschedule_amount);
+        setunallocated_amount(unallocated_amount);
         //console.log(response.data.data);
         console.log(response.data.data["Invoice_Sum"]);
       })
@@ -1064,6 +1115,10 @@ function App() {
   const [currentPage5, setCurrentPage5] = useState(1); // pagination state
   const [rowsPerPage5, setRowsPerPage5] = useState(10); // row control state
   const [selectedRows5, setSelectedRows5] = useState([]);
+  const [selectedRows6, setSelectedRows6] = useState([]);
+  const [currentPage6, setCurrentPage6] = useState(1); // pagination state
+  const [rowsPerPage6, setRowsPerPage6] = useState(10); // row control state
+
   //-----Table1 Data---------------------------------------------------
 
   const columns1 = [
@@ -1328,7 +1383,7 @@ function App() {
     return (
       <CSVLink
         data={selectedDataToExport2}
-        filename="table_value.csv"
+        filename="completedschedules.csv"
         className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
       >
         <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
@@ -1686,6 +1741,228 @@ function App() {
     );
   };
 
+  const columns6 = [
+    {
+      name: "S.NO",
+      cell: (row) => {
+        const index = tabledata6.indexOf(row);
+        return (currentPage1 - 1) * rowsPerPage6 + index + 1;
+      },
+      sortable: true,
+      width: "80px",
+    },
+    {
+      name: "BRANCH NAME",
+      selector: "branch_name",
+      sortable: true,
+      width: "230px",
+    },
+    {
+      name: "PATIENT NAME",
+      selector: "first_name",
+      sortable: true,
+      width: "170px",
+    },
+    {
+      name: "PATIENT ID",
+      selector: "patient_id",
+      sortable: true,
+      width: "170px",
+    },
+    {
+      name: "Receipt Type",
+      selector: "receipt_type",
+      sortable: true,
+    },
+    {
+      name: "Payment Mode",
+      selector: "payment_mode",
+      sortable: true,
+    },
+    {
+      name: "Reference No",
+      selector: "reference_no",
+      sortable: true,
+    },
+    {
+      name: "Receipt No",
+      selector: "receipt_no",
+      sortable: true,
+    },
+    {
+      name: "Receipt Date",
+      selector: "receipt_date",
+      sortable: true,
+      width: "150px",
+      cell: (row) => {
+        // Parse the date string into a Date object
+        const originalDate = new Date(row.receipt_date);
+
+        // Format the date as "YYYY-MM-DD"
+        const formattedDate = originalDate.toISOString().split("T")[0];
+
+        return formattedDate;
+      },
+    },
+    {
+      name: "Receipt Amount",
+      selector: "receipt_amount",
+      sortable: true,
+      cell: (row) => (
+        <span>
+          {
+            new Intl.NumberFormat("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })
+              .format(row.receipt_amount)
+              .split(".")[0]
+          }
+        </span>
+      ),
+    },
+  ];
+
+  const handleExportSelected6 = () => {
+    const selectedDataToExport6 = selectedRows6.map((row, index) => ({
+      Sno: index + 1,
+      Branch_Name: row.branch_name,
+      Patient_Name: row.first_name,
+      Patient_ID: row.patient_id,
+      Receipt_Type: row.receipt_type,
+      Payment_Mode: row.payment_mode,
+      Reference_No: row.reference_no,
+      Receipt_No: row.receipt_no,
+      Receipt_Date: row.receipt_date,
+      Receipt_Amount: new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+      })
+        .format(row.receipt_amount)
+        .split(".")[0],
+    }));
+
+    selectedDataToExport6.sort((a, b) => a.Sno - b.Sno);
+
+    return (
+      <CSVLink
+        data={selectedDataToExport6}
+        filename="unapproved.csv"
+        className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
+      >
+        <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
+          Export Selected as CSV
+        </span>
+      </CSVLink>
+    );
+  };
+
+
+
+  // const columns7 = [
+  //   {
+  //     name: "Sno",
+  //     // selector: 'id', // Adjust this to your data structure
+  //     cell: (row) => {
+  //       const index = tabledata1.indexOf(row);
+  //       return (currentPage1 - 1) * rowsPerPage1 + index + 1;
+  //     },
+  //     sortable: true,
+  //     width: "70px",
+  //   },
+  //   {
+  //     name: "Branch",
+  //     selector: "branch_name",
+  //     sortable: true,
+  //     width: "270px",
+  //   },
+  //   {
+  //     name: "Patient ID",
+  //     selector: "patient_id",
+  //     sortable: true,
+  //   },
+  //   {
+  //     name: "Patient Name",
+  //     selector: "first_name",
+  //     sortable: true,
+  //     width: "250px",
+  //   },
+  //   {
+  //     name: "Invoice No",
+  //     selector: "invoice_no",
+  //     sortable: true,
+  //   },
+  //   {
+  //     name: "Invoice Date",
+  //     selector: "dates",
+  //     sortable: true,
+  //   },
+  //   {
+  //     name: "Amount",
+  //     selector: "total_amount",
+  //     sortable: true,
+  //     cell: (row) => (
+  //       <span>
+  //         {
+  //           new Intl.NumberFormat("en-IN", {
+  //             style: "currency",
+  //             currency: "INR",
+  //           })
+  //             .format(row.total_amount)
+  //             .split(".")[0]
+  //         }
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     name: "Paid",
+  //     selector: "amount_paid",
+  //     sortable: true,
+  //     cell: (row) => (
+  //       <span>
+  //         {
+  //           new Intl.NumberFormat("en-IN", {
+  //             style: "currency",
+  //             currency: "INR",
+  //           })
+  //             .format(row.amount_paid)
+  //             .split(".")[0]
+  //         }
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     name: "Status",
+  //     selector: "status",
+  //     sortable: true,
+  //     cell: (row) => (
+  //       <span
+  //         className={`${row.status === "Pending"
+  //           ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+  //           : row.status === "Paid"
+  //             ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+  //             : "text-black" // Default color for other statuses
+  //           }`}
+  //       >
+  //         {row.status}
+  //       </span>
+  //     ),
+  //   },
+  // ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //------ If Data  False, then Table is Displayed without service Data --------------------------------------------
   if (firstbar == false) {
     //-----Onclick to fetch Invoices Data---------------------------------------------------
@@ -1728,9 +2005,7 @@ function App() {
               toggleDetails(item.id);
             });
           }}
-
           expandableRowsComponent={({ data }) => (
-
             <div>
               {isLoading2 ? (
                 <div className="animate-pulse">
@@ -1740,76 +2015,70 @@ function App() {
                   <div className="h-4 mb-6 bg-gray-300 rounded"></div>
                   <div className="h-4 mb-6 bg-gray-200 rounded"></div>
                 </div>
-              ) : (<div>
+              ) : (
                 <div>
-                  <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1]">
-                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                      Sno
+                  <div>
+                    <div className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100 bg-[#5383a1]">
+                      <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                        Sno
+                      </div>
+                      <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                        Branch Name
+                      </div>
+                      <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                        Schedule Date
+                      </div>
+                      <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                        Service Name
+                      </div>
+                      <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
+                        Amount
+                      </div>
                     </div>
-                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                      Branch Name
-                    </div>
-                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                      Schedule Date
-                    </div>
-                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                      Service Name
-                    </div>
-                    <div className="col-span-1 bg-[#5383a1] text-center font-semibold text-white">
-                      Amount
-                    </div>
+                    {splitup[data.id] &&
+                      splitup[data.id].map((item, index) => {
+                        // Calculate the formatted date here
+                        const inputDate = new Date(item.schedule_date);
+                        const formattedDate = `${inputDate.getFullYear()}-${String(
+                          inputDate.getMonth() + 1
+                        ).padStart(2, "0")}-${String(
+                          inputDate.getDate()
+                        ).padStart(2, "0")}`;
+
+                        return (
+                          <div
+                            className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100"
+                            key={index}
+                          >
+                            <div className="col-span-1 font-normal text-center text-black ">
+                              {index + 1}
+                            </div>
+                            <div className="col-span-1 font-normal text-center text-black ">
+                              {item.branch_name}
+                            </div>
+                            <div className="col-span-1 font-normal text-center text-black ">
+                              {formattedDate}
+                            </div>
+                            <div className="col-span-1 font-normal text-center text-black ">
+                              {item.service_name}
+                            </div>
+                            <div className="col-span-1 font-normal text-center text-black ">
+                              {
+                                new Intl.NumberFormat("en-IN", {
+                                  style: "currency",
+                                  currency: "INR",
+                                })
+                                  .format(item.amount)
+                                  .split(".")[0]
+                              }
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
-                  {splitup[data.id] &&
-                    splitup[data.id].map((item, index) => {
-                      // Calculate the formatted date here
-                      const inputDate = new Date(item.schedule_date);
-                      const formattedDate = `${inputDate.getFullYear()}-${String(
-                        inputDate.getMonth() + 1
-                      ).padStart(2, "0")}-${String(inputDate.getDate()).padStart(
-                        2,
-                        "0"
-                      )}`;
-
-                      return (
-                        <div
-                          className="grid grid-cols-5 gap-3 p-2 border-b border-gray-100"
-                          key={index}
-                        >
-                          <div className="col-span-1 font-normal text-center text-black ">
-                            {index + 1}
-                          </div>
-                          <div className="col-span-1 font-normal text-center text-black ">
-                            {item.branch_name}
-                          </div>
-                          <div className="col-span-1 font-normal text-center text-black ">
-                            {formattedDate}
-                          </div>
-                          <div className="col-span-1 font-normal text-center text-black ">
-                            {item.service_name}
-                          </div>
-                          <div className="col-span-1 font-normal text-center text-black ">
-                            {
-                              new Intl.NumberFormat("en-IN", {
-                                style: "currency",
-                                currency: "INR",
-                              })
-                                .format(item.amount)
-                                .split(".")[0]
-                            }
-                          </div>
-                        </div>
-                      );
-                    })}
                 </div>
-              </div>)
-
-
-              }
+              )}
             </div>
-
-
-
-
           )}
         />
       );
@@ -1850,13 +2119,7 @@ function App() {
     else if (selecttype === "pendingschedules") {
       tableContent = isLoading ? (
         // Step 2: Conditional rendering for the loading animation
-        <div className="animate-pulse">
-          <div className="h-4 mt-3 mb-6 bg-gray-200 rounded"></div>
-          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
-          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
-          <div className="h-4 mb-6 bg-gray-300 rounded"></div>
-          <div className="h-4 mb-6 bg-gray-200 rounded"></div>
-        </div>
+        <LoadingSpinner />
       ) : (
         <DataTable
           columns={columns3}
@@ -1873,6 +2136,61 @@ function App() {
           onTableUpdate={({ page, rowsPerPage }) => {
             setCurrentPage3(page);
             setRowsPerPage3(rowsPerPage);
+          }}
+          striped
+          customStyles={tableCustomStyles}
+        />
+      );
+    }
+    else if (selecttype === "unallocatedFunds") {
+      tableContent = isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <DataTable
+          columns={columns6}
+          data={tabledata6}
+          pagination
+          paginationPerPage={rowsPerPage6}
+          paginationRowsPerPageOptions={[5, 10, 20, 50, 100, 250, 500]}
+          paginationTotalRows={tabledata6.length}
+          paginationDefaultPage={currentPage6}
+          selectableRows
+          onSelectedRowsChange={(selectedRows) => {
+            setSelectedRows6(selectedRows.selectedRows);
+
+
+
+          }}
+          onTableUpdate={({ page, rowsPerPage }) => {
+            setCurrentPage6(page);
+            setRowsPerPage6(rowsPerPage);
+          }}
+          striped
+          customStyles={tableCustomStyles}
+        />
+      )
+    } else if (selecttype === "receipts") {
+      tableContent = isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <DataTable
+          columns={columns1}
+          data={tabledata1}
+          pagination
+          paginationPerPage={rowsPerPage1}
+          paginationRowsPerPageOptions={[5, 10, 20, 50, 100, 250, 500]}
+          paginationTotalRows={tabledata1.length}
+          paginationDefaultPage={currentPage1}
+          selectableRows
+          onSelectedRowsChange={(selectedRows) => {
+            setSelectedRows6(selectedRows.selectedRows);
+
+
+
+          }}
+          onTableUpdate={({ page, rowsPerPage }) => {
+            setCurrentPage6(page);
+            setRowsPerPage6(rowsPerPage);
           }}
           striped
           customStyles={tableCustomStyles}
@@ -2064,7 +2382,6 @@ function App() {
         <nav className="relative flex flex-wrap items-center justify-between w-full py-2 shadow-lg bg-bahama-blue-800 text-neutral-500 hover:text-neutral-700 focus:text-neutral-700 lg:py-4">
           <div className="flex flex-wrap items-center justify-between w-full px-3">
             <div>
-
               <div className="flex items-center my-1 mx-14 text-neutral-900 hover:text-neutral-900 focus:text-neutral-900 lg:mb-0 lg:mt-0">
                 <img
                   src="https://www.athulyahomecare.com/lp/ophthalmology/Assest/logo.png"
@@ -2630,6 +2947,58 @@ function App() {
                     </div>
                   </div>
                 )}
+                {!firstbar && (
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-[#8EACCD]">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-[#8EACCD]">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="32"
+                              height="32"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fill="#ffff"
+                                fillRule="evenodd"
+                                d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0A2.213 2.213 0 0 1 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344l-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344l-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Zm4.822 4.997a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 0 0 1.004-1.114L8.704 8.75h1.921a1.875 1.875 0 0 1 0 3.75a.75.75 0 0 0 0 1.5a3.375 3.375 0 1 0 0-6.75h-1.92l1.047-.943Z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2
+                            style={cursorstyle}
+                            onClick={unallocatedFunds}
+                            className="font-bold text-gray-600 uppercase"
+                          >
+                            Unallocated Funds
+                          </h2>
+                          <p className="font-sans font-semibold xl:text-2xl">
+                            {isLoading ? (
+                              // Step 2: Conditional rendering for the loading animation
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
+                            ) : (
+                              unallocated_amount
+                            )}{" "}
+                            <span className="text-yellow-600">
+                              <i className="fas fa-caret-up"></i>
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Service Completed Schedules */}
 
@@ -2769,7 +3138,6 @@ function App() {
                 {isLoading ? (
                   // Step 2: Conditional rendering for the loading animation
                   <div className="grid grid-cols-2">
-
                     <div
                       role="status"
                       className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 "
@@ -2805,8 +3173,6 @@ function App() {
                       <span className="sr-only">Loading...</span>
                     </div>
                   </div>
-
-
                 ) : (
                   <CanvasJSChart options={category_chart_options} />
                 )}
@@ -2829,7 +3195,8 @@ function App() {
                   (selectedRows2.length > 0 && handleExportSelected2()) ||
                   (selectedRows3.length > 0 && handleExportSelected3()) ||
                   (selectedRows4.length > 0 && handleExportSelected4()) ||
-                  (selectedRows5.length > 0 && handleExportSelected5())}
+                  (selectedRows5.length > 0 && handleExportSelected5()) ||
+                  (selectedRows6.length > 0 && handleExportSelected6())}
               </div>
               <div className="rounded shadow-md sm:rounded-lg ">
                 {tableContent}
