@@ -23,6 +23,7 @@ function App() {
   const [pendingservicescheduleamount, setpendingserviceschedulesamount] =
     useState(0);
   const [unallocated_amount, setunallocated_amount] = useState(0);
+  const [b2b_funds, setb2b_funds] = useState(0);
   const [estimatedamount, setestimatedamount] = useState(0);
   const [remainingamount, setremainingamount] = useState(0);
   const [servicecategory, setservicecategory] = useState([]);
@@ -54,8 +55,8 @@ function App() {
   const [isLoading2, setIsLoading2] = useState(false);
 
   // console.log(tabledata3);
-  console.log(tabledata6);
-  console.log(selecttype);
+  // console.log(tabledata6);
+  // console.log(selecttype);
 
   // console.log(piechartCategory);
   // console.log(piechartdata);
@@ -65,7 +66,7 @@ function App() {
     fetchData();
     //fetchMastersevices();
     fetchMastercategories();
-    console.log(selecttype);
+    // console.log(selecttype);
   }, []);
 
   var CanvasJS = CanvasJSReact.CanvasJS;
@@ -161,7 +162,7 @@ function App() {
       // console.log("seeema");
       //const newItem = { id: -1, value: 'All', label: 'All' ,selected: true};
       const all_Categories = mastercategoryOption;
-      console.log(all_Categories);
+      // console.log(all_Categories);
       setMastercategories(all_Categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -219,14 +220,14 @@ function App() {
     var category = dataPoint.label;
     var select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(branch);
-    console.log(category);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(branch);
+    // console.log(category);
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(branch);
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
     setIsLoading(true);
@@ -238,7 +239,7 @@ function App() {
         //setData(response.data);
         setselecttype("Category");
         settabledata2(response.data.data);
-        console.log(response.data.data);
+        // console.log(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -286,9 +287,9 @@ function App() {
     to_Date = `${year}-${month}-${day}`;
     var select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
     setIsLoading(true);
     axios
       .post(
@@ -334,9 +335,9 @@ function App() {
     to_Date = `${year}-${month}-${day}`;
     var select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
     setIsLoading(true);
     axios
       .post(
@@ -363,6 +364,8 @@ function App() {
     var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
     var yyyy = today.getFullYear();
 
+
+
     today = yyyy + "-" + mm + "-" + dd;
     from_Date = !fromDate ? today : from_Date;
     to_Date = !toDate ? today : to_Date;
@@ -382,9 +385,9 @@ function App() {
     to_Date = `${year}-${month}-${day}`;
     const select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
 
     const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
@@ -396,7 +399,7 @@ function App() {
         //setData(response.data);
         setselecttype("completedschedules");
         settabledata3(response.data.success);
-        console.log(response.data.success);
+        // console.log(response.data.success);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -432,9 +435,9 @@ function App() {
     to_Date = `${year}-${month}-${day}`;
     const select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
 
     const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
@@ -447,7 +450,7 @@ function App() {
         setselecttype("pendingschedules");
         settabledata4(response.data.success);
 
-        console.log(response.data.success);
+        // console.log(response.data.success);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -484,9 +487,9 @@ function App() {
     to_Date = `${year}-${month}-${day}`;
     const select_branch = branch.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
 
     const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
@@ -499,7 +502,7 @@ function App() {
         setselecttype("unallocatedFunds");
         settabledata6(response.data.data);
 
-        console.log(response.data.data);
+        // console.log(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -508,6 +511,28 @@ function App() {
         setIsLoading(false);
       });
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   //---- Fetch Current Date and Branch Data Fetching-------------------------------------------------------------
 
@@ -534,22 +559,22 @@ function App() {
 
     // Rest of your code for API calls using Axios...
 
-    console.log("From Date:", formattedFrom_Date);
-    console.log("To Date:", formattedTo_Date);
-    console.log("Branch ID:", branch.id);
-    console.log("Category: ", mastercategories);
-    console.log("Selected Category", selectedCategory.id);
-    console.log("Hide/Show: ", firstbar);
+    // console.log("From Date:", formattedFrom_Date);
+    // console.log("To Date:", formattedTo_Date);
+    // console.log("Branch ID:", branch.id);
+    // console.log("Category: ", mastercategories);
+    // console.log("Selected Category", selectedCategory.id);
+    // console.log("Hide/Show: ", firstbar);
     var select_branch = branch.id;
     var select_category = selectedCategory.id;
 
-    console.log(from_Date);
-    console.log(to_Date);
-    console.log(select_branch);
-    console.log(select_category);
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
+    // console.log(select_category);
 
     if (!select_category) {
-      console.log("Not Selected");
+      // console.log("Not Selected");
       setfirstbar(false);
     } else {
       const branchIdParam = select_branch !== null ? select_branch : "";
@@ -635,7 +660,7 @@ function App() {
     }
     //from_Date='2023-09-01';
     //to_Date='2023-09-24';
-    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    // console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
     const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
@@ -646,7 +671,7 @@ function App() {
       .then((response) => {
         //setData(response.data);
         settabledata1(response.data.data);
-        console.log(response.data.data);
+        // console.log(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -655,7 +680,7 @@ function App() {
         setIsLoading(false);
       });
 
-    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    // console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
     firstbar == false
       ? axios
@@ -665,8 +690,8 @@ function App() {
         .then((response) => {
           //setData(response.data);formattedTo_Date
           setservicecategory(response.data.data);
-          console.log(response.data.data);
-          console.log("setservicecategory2", response.data.data);
+          // console.log(response.data.data);
+          // console.log("setservicecategory2", response.data.data);
         })
         .catch((error) => {
           console.error("Error fetching data: ", error);
@@ -679,7 +704,7 @@ function App() {
           //setData(response.data);formattedTo_Date
           setservicecategory(response.data.data);
           console.log("setservicecategory", response.data.data);
-          console.log(servicecategory);
+          // console.log(servicecategory);
         })
         .catch((error) => {
           console.error("Error fetching data: ", error);
@@ -691,7 +716,7 @@ function App() {
       )
       .then((response) => {
         setPiechartCategory(response.data.data);
-        console.log(response.data.data);
+        // console.log(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -709,8 +734,8 @@ function App() {
         //setData(response.data);
         setalldaydata(response.data.data);
         //console.log(response.data.data);
-        console.log("all day data", alldaydata);
-        console.log("branchIdParam all day ", branchIdParam);
+        // console.log("all day data", alldaydata);
+        // console.log("branchIdParam all day ", branchIdParam);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -719,7 +744,7 @@ function App() {
         setIsLoading(false);
       });
 
-    console.log(formattedFrom_Date, formattedTo_Date, select_branch);
+    // console.log(formattedFrom_Date, formattedTo_Date, select_branch);
     let select_branchs = branch.id;
     console.log(formattedFrom_Date, formattedTo_Date, select_branchs);
     setIsLoading(true);
@@ -729,7 +754,7 @@ function App() {
       )
       .then((response) => {
         setPiechartdata(response.data.data);
-        console.log(response.data.data);
+        // console.log(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -747,7 +772,7 @@ function App() {
     //     console.error('Error fetching data: ', error);
     //   });
 
-    console.log(formattedFrom_Date, formattedTo_Date, branchIdParam);
+    // console.log(formattedFrom_Date, formattedTo_Date, branchIdParam);
 
     setIsLoading(true);
     axios
@@ -757,17 +782,18 @@ function App() {
 
       .then((response) => {
         //setData(response.data);
-        console.log("branch null", branchIdParam);
-        console.log(response.data.data);
+        // console.log("branch null", branchIdParam);
+        // console.log(response.data.data);
         var invoice_amount = response.data.data["Invoice_Sum"];
         var receipt_amount = response.data.data["Receipt_Sum"];
         var completedschedules_amount =
           response.data.data["Completed_Schedule_Sum"];
         var unallocated_amount = response.data.data["Unapproved_Funds"];
+        var b2b_funds = response.data.data["B2B_Funds"];
         var remaining_amount = invoice_amount - receipt_amount;
         var estimated_sum = invoice_amount + completedschedules_amount;
 
-        console.log(unallocated_amount);
+        // console.log(unallocated_amount);
 
         var pendingschedule_amount =
           response.data.data["Pending_Schedules_Sum"];
@@ -811,11 +837,13 @@ function App() {
         estimated_sum = estimated_sum.split(".")[0];
         unallocated_amount = rupeeIndian.format(unallocated_amount);
         unallocated_amount = unallocated_amount.split(".")[0];
+        b2b_funds = rupeeIndian.format(b2b_funds);
+        b2b_funds = b2b_funds.split(".")[0];
 
-        console.log(unallocated_amount);
+        // console.log(unallocated_amount);
 
-        console.log(invoice_amount);
-        console.log(completedschedules_amount);
+        // console.log(invoice_amount);
+        // console.log(completedschedules_amount);
 
         setinvoiceamount(invoice_amount);
         setreceipamount(receipt_amount);
@@ -824,8 +852,9 @@ function App() {
         setestimatedamount(estimated_sum);
         setpendingschedulesamount(pendingschedule_amount);
         setunallocated_amount(unallocated_amount);
+        setb2b_funds(b2b_funds);
         //console.log(response.data.data);
-        console.log(response.data.data["Invoice_Sum"]);
+        // console.log(response.data.data["Invoice_Sum"]);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -1039,12 +1068,13 @@ function App() {
       firstbar === false
         ? piechartdata.map((item) => ({
           y: item.total_amount_sum,
-          label: item.branch_name,
+          label: item.branch_name.replace('Athulya Homecare', ''),
+
           yValueFormatString: formatCurrency(item.total_amount_sum),
         }))
         : piechartCategory.map((item) => ({
           y: item.total_amount_sum,
-          label: item.branch_name,
+          label: item.branch_name.replace('Athulya Homecare', ''),
           yValueFormatString: formatCurrency(item.total_amount_sum),
         }));
     const options = {
@@ -1064,7 +1094,7 @@ function App() {
           e.entries.forEach(function (entry) {
             if (entry.dataPoint.name) {
               content +=
-                entry.dataPoint.name + ": " + entry.dataPoint.label + "<br>";
+                entry.dataPoint.name + ": " + entry.dataPoint + "<br>";
               content +=
                 entry.dataPoint.name +
                 ": " +
@@ -1081,8 +1111,9 @@ function App() {
       },
       data: [
         {
-          type: "bar",
-          indexLabel: "{label}: {yValueFormatString}",
+          type: "column",
+          indexLabel: " {yValueFormatString}",
+          // indexLabel: "{label}: {yValueFormatString}",
           startAngle: -180,
           dataPoints: dataPoints,
         },
@@ -1857,8 +1888,6 @@ function App() {
     );
   };
 
-
-
   // const columns7 = [
   //   {
   //     name: "Sno",
@@ -1949,19 +1978,6 @@ function App() {
   //     ),
   //   },
   // ];
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   //------ If Data  False, then Table is Displayed without service Data --------------------------------------------
   if (firstbar == false) {
@@ -2141,8 +2157,7 @@ function App() {
           customStyles={tableCustomStyles}
         />
       );
-    }
-    else if (selecttype === "unallocatedFunds") {
+    } else if (selecttype === "unallocatedFunds") {
       tableContent = isLoading ? (
         <LoadingSpinner />
       ) : (
@@ -2157,9 +2172,6 @@ function App() {
           selectableRows
           onSelectedRowsChange={(selectedRows) => {
             setSelectedRows6(selectedRows.selectedRows);
-
-
-
           }}
           onTableUpdate={({ page, rowsPerPage }) => {
             setCurrentPage6(page);
@@ -2168,7 +2180,7 @@ function App() {
           striped
           customStyles={tableCustomStyles}
         />
-      )
+      );
     } else if (selecttype === "receipts") {
       tableContent = isLoading ? (
         <LoadingSpinner />
@@ -2184,9 +2196,6 @@ function App() {
           selectableRows
           onSelectedRowsChange={(selectedRows) => {
             setSelectedRows6(selectedRows.selectedRows);
-
-
-
           }}
           onTableUpdate={({ page, rowsPerPage }) => {
             setCurrentPage6(page);
@@ -2974,7 +2983,7 @@ function App() {
                             onClick={unallocatedFunds}
                             className="font-bold text-gray-600 uppercase"
                           >
-                            Unallocated Funds
+                            Unacknownledged Funds
                           </h2>
                           <p className="font-sans font-semibold xl:text-2xl">
                             {isLoading ? (
@@ -2989,6 +2998,58 @@ function App() {
                               </div>
                             ) : (
                               unallocated_amount
+                            )}{" "}
+                            <span className="text-yellow-600">
+                              <i className="fas fa-caret-up"></i>
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!firstbar && (
+                  <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-[#DFCCFB]">
+                      <div className="flex flex-row items-center">
+                        <div className="flex-shrink pr-4">
+                          <div className="p-5 rounded-full bg-[#DFCCFB]">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="32"
+                              height="32"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fill="#ffff"
+                                fillRule="evenodd"
+                                d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0A2.213 2.213 0 0 1 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344l-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344l-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Zm4.822 4.997a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 0 0 1.004-1.114L8.704 8.75h1.921a1.875 1.875 0 0 1 0 3.75a.75.75 0 0 0 0 1.5a3.375 3.375 0 1 0 0-6.75h-1.92l1.047-.943Z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="flex-1 text-right md:text-center">
+                          <h2
+                            style={cursorstyle}
+                            onClick={unallocatedFunds}
+                            className="font-bold text-gray-600 uppercase"
+                          >
+                            B2B Funds
+                          </h2>
+                          <p className="font-sans font-semibold xl:text-2xl">
+                            {isLoading ? (
+                              // Step 2: Conditional rendering for the loading animation
+                              <div
+                                role="status"
+                                className="max-w-sm animate-pulse"
+                              >
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                              </div>
+                            ) : (
+                              b2b_funds
                             )}{" "}
                             <span className="text-yellow-600">
                               <i className="fas fa-caret-up"></i>
