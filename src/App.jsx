@@ -24,6 +24,7 @@ function App() {
     useState(0);
   const [unallocated_amount, setunallocated_amount] = useState(0);
   const [b2b_funds, setb2b_funds] = useState(0);
+  // const [Inhouse_funds, setInhouse_funds] = useState(0);
   const [estimatedamount, setestimatedamount] = useState(0);
   const [remainingamount, setremainingamount] = useState(0);
   const [servicecategory, setservicecategory] = useState([]);
@@ -35,6 +36,7 @@ function App() {
   const [tabledata4, settabledata4] = useState([]);
   const [tabledata5, settabledata5] = useState([]);
   const [tabledata6, settabledata6] = useState([]);
+  const [tabledata7, settabledata7] = useState([]);
   const [selecttype, setselecttype] = useState("Invoices");
   const [splitup, setSplitup] = useState({});
   //const [masterservices, setMasterservices] = useState([]);
@@ -364,8 +366,6 @@ function App() {
     var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
     var yyyy = today.getFullYear();
 
-
-
     today = yyyy + "-" + mm + "-" + dd;
     from_Date = !fromDate ? today : from_Date;
     to_Date = !toDate ? today : to_Date;
@@ -512,27 +512,55 @@ function App() {
       });
   };
 
+  const getb2bscheduledfunds = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var yyyy = today.getFullYear();
 
+    today = yyyy + "-" + mm + "-" + dd;
+    from_Date = !fromDate ? today : from_Date;
+    to_Date = !toDate ? today : to_Date;
 
+    var from_Date = new Date(fromDate);
+    var year = from_Date.getFullYear();
+    var month = String(from_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    var day = String(from_Date.getDate()).padStart(2, "0");
 
+    from_Date = `${year}-${month}-${day}`;
 
+    var to_Date = new Date(toDate);
+    year = to_Date.getFullYear();
+    month = String(to_Date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so add 1 and pad with zeros
+    day = String(to_Date.getDate()).padStart(2, "0");
 
+    to_Date = `${year}-${month}-${day}`;
+    const select_branch = branch.id;
 
+    // console.log(from_Date);
+    // console.log(to_Date);
+    // console.log(select_branch);
 
+    const branchIdParam = select_branch !== null ? select_branch : "";
+    setIsLoading(true);
+    axios
+      .post(
+        `${URLDevelopment}/getb2bfunds?from_date=${from_Date}&to_date=${to_Date}&branch_id=${branchIdParam}`
+      )
+      .then((response) => {
+        //setData(response.data);
+        setselecttype("b2bschedulefunds");
+        settabledata7(response.data.data);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        console.log(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   //---- Fetch Current Date and Branch Data Fetching-------------------------------------------------------------
 
@@ -662,6 +690,8 @@ function App() {
     //to_Date='2023-09-24';
     // console.log(formattedFrom_Date, formattedTo_Date, select_branch);
 
+
+    //---------getinvoice  -------------------------------------------------------------------------------------------------------------------------
     const branchIdParam = select_branch !== null ? select_branch : "";
     setIsLoading(true);
     axios
@@ -789,12 +819,13 @@ function App() {
         var completedschedules_amount =
           response.data.data["Completed_Schedule_Sum"];
         var unallocated_amount = response.data.data["Unapproved_Funds"];
-        var b2b_funds = response.data.data["B2B_Funds"];
+        var b2b_funds = response.data.data["b2b_funds"];
+        var Inhouse_Funds = response.data.data["Inhouse_Funds"];
         var remaining_amount = invoice_amount - receipt_amount;
         var estimated_sum = invoice_amount + completedschedules_amount;
 
-        // console.log(unallocated_amount);
-
+        console.log(completedschedules_amount);
+        console.log(b2b_funds);
         var pendingschedule_amount =
           response.data.data["Pending_Schedules_Sum"];
         let rupeeIndian = Intl.NumberFormat("en-IN", {
@@ -839,8 +870,10 @@ function App() {
         unallocated_amount = unallocated_amount.split(".")[0];
         b2b_funds = rupeeIndian.format(b2b_funds);
         b2b_funds = b2b_funds.split(".")[0];
+        Inhouse_Funds = rupeeIndian.format(Inhouse_Funds);
+        Inhouse_Funds = Inhouse_Funds.split(".")[0];
 
-        // console.log(unallocated_amount);
+        console.log(Inhouse_Funds);
 
         // console.log(invoice_amount);
         // console.log(completedschedules_amount);
@@ -853,8 +886,9 @@ function App() {
         setpendingschedulesamount(pendingschedule_amount);
         setunallocated_amount(unallocated_amount);
         setb2b_funds(b2b_funds);
-        //console.log(response.data.data);
-        // console.log(response.data.data["Invoice_Sum"]);
+        // setInhouse_funds(Inhouse_Funds);
+        console.log(response.data.data);
+        console.log(response.data.data["b2b_funds"]);
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
@@ -1068,13 +1102,13 @@ function App() {
       firstbar === false
         ? piechartdata.map((item) => ({
           y: item.total_amount_sum,
-          label: item.branch_name.replace('Athulya Homecare', ''),
+          label: item.branch_name.replace("Athulya Homecare", ""),
 
           yValueFormatString: formatCurrency(item.total_amount_sum),
         }))
         : piechartCategory.map((item) => ({
           y: item.total_amount_sum,
-          label: item.branch_name.replace('Athulya Homecare', ''),
+          label: item.branch_name.replace("Athulya Homecare", ""),
           yValueFormatString: formatCurrency(item.total_amount_sum),
         }));
     const options = {
@@ -1093,8 +1127,7 @@ function App() {
           let content = "";
           e.entries.forEach(function (entry) {
             if (entry.dataPoint.name) {
-              content +=
-                entry.dataPoint.name + ": " + entry.dataPoint + "<br>";
+              content += entry.dataPoint.name + ": " + entry.dataPoint + "<br>";
               content +=
                 entry.dataPoint.name +
                 ": " +
@@ -1149,6 +1182,9 @@ function App() {
   const [selectedRows6, setSelectedRows6] = useState([]);
   const [currentPage6, setCurrentPage6] = useState(1); // pagination state
   const [rowsPerPage6, setRowsPerPage6] = useState(10); // row control state
+  const [selectedRow7, setSelectedRow7] = useState([]);
+  const [currentPage7, setCurrentPage7] = useState(1); // pagination state
+  const [rowsPerPage7, setRowPerpage7] = useState(10); // row control state
 
   //-----Table1 Data---------------------------------------------------
 
@@ -1241,6 +1277,8 @@ function App() {
         </span>
       ),
     },
+
+
   ];
 
   //-----table header and body color---------------------------------------------------
@@ -1888,6 +1926,96 @@ function App() {
     );
   };
 
+  const columns7 = [
+    {
+      name: "Sno",
+      cell: (row) => {
+        const index = tabledata7.indexOf(row);
+        return (currentPage1 - 1) * rowsPerPage6 + index + 1;
+      },
+      sortable: true,
+      width: "80px",
+    },
+    {
+      name: "BRANCH NAME",
+      selector: "branch_name",
+      sortable: true,
+      width: "230px",
+    },
+    {
+      name: "PATIENT NAME",
+      selector: "first_name",
+      sortable: true,
+      width: "170px",
+    },
+    {
+      name: "PATIENT ID",
+      selector: "patient_id",
+    },
+    {
+      name: "CATEGORY NAME",
+      selector: "category_name",
+      sortable: true,
+    },
+    {
+      name: "SERVICEREQUESTED",
+      selector: "service_requested",
+      sortable: true,
+    },
+    {
+      name: "schedule_date",
+      selector: "schedule_date",
+      sortable: true,
+    },
+    {
+      name: "Assign Task",
+      selector: "assign_task",
+      sortable: true,
+    },
+    {
+      name: "MEMBERSHIP TYPE",
+      selector: "membership_type",
+      sortable: true,
+    },
+    {
+      name: "AMOUNT",
+      selector: "amount",
+      sortable: true,
+    },
+  ];
+
+  const handleExportSelected7 = () => {
+    const selectedDataToExport7 = selectedRow7.map((row, index) => ({
+      Sno: index + 1,
+      BRANCH_NAME: row.branch_name,
+      PATIENT_NAME: row.first_name,
+      PATIENT_ID: row.patient_id,
+      CATEGORY_NAME: row.category_name,
+      SERVICEREQUESTED: row.service_requested,
+      schedule_date: row.schedule_date,
+      Assign_Task: row.assign_task,
+      MEMBERSHIP_TYPE: row.membership_type,
+      AMOUNT: new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+      })
+        .format(row.amount)
+        .split(".")[0],
+    }));
+
+    return (
+      <CSVLink
+        data={selectedDataToExport7}
+        filename="table_value.csv"
+        className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
+      >
+        <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
+          Export Selected as CSV
+        </span>
+      </CSVLink>
+    );
+  };
+
   // const columns7 = [
   //   {
   //     name: "Sno",
@@ -2176,6 +2304,30 @@ function App() {
           onTableUpdate={({ page, rowsPerPage }) => {
             setCurrentPage6(page);
             setRowsPerPage6(rowsPerPage);
+          }}
+          striped
+          customStyles={tableCustomStyles}
+        />
+      );
+    } else if (selecttype === "b2bschedulefunds") {
+      tableContent = isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <DataTable
+          columns={columns7}
+          data={tabledata7}
+          pagination
+          paginationPerPage={rowsPerPage7}
+          paginationRowsPerPageOptions={[5, 10, 20, 50, 100, 250, 500]}
+          paginationTotalRows={tabledata7.length}
+          paginationDefaultPage={currentPage7}
+          selectableRows
+          onSelectedRowsChange={(selectedRows) => {
+            setSelectedRow7(selectedRows.selectedRows);
+          }}
+          onTableUpdate={({ page, rowsPerPage }) => {
+            setCurrentPage7(page);
+            setRowPerpage7(rowsPerPage);
           }}
           striped
           customStyles={tableCustomStyles}
@@ -3010,10 +3162,10 @@ function App() {
                 )}
                 {!firstbar && (
                   <div className="w-full p-6 md:w-1/2 xl:w-1/3">
-                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-[#DFCCFB]">
+                    <div className="p-5 bg-white border-b-4 rounded-lg shadow-xl border-[#d0b1ff]">
                       <div className="flex flex-row items-center">
                         <div className="flex-shrink pr-4">
-                          <div className="p-5 rounded-full bg-[#DFCCFB]">
+                          <div className="p-5 rounded-full bg-[#d0b1ff]">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="32"
@@ -3029,32 +3181,36 @@ function App() {
                             </svg>
                           </div>
                         </div>
-                        <div className="flex-1 text-right md:text-center">
-                          <h2
-                            style={cursorstyle}
-                            onClick={unallocatedFunds}
-                            className="font-bold text-gray-600 uppercase"
-                          >
-                            B2B Funds
-                          </h2>
-                          <p className="font-sans font-semibold xl:text-2xl">
-                            {isLoading ? (
-                              // Step 2: Conditional rendering for the loading animation
-                              <div
-                                role="status"
-                                className="max-w-sm animate-pulse"
+                        <div className="flex-1 text-right md:text-center place-content-around">
+                          <div className="">
+                            <div>
+                              <h2
+                                style={cursorstyle}
+                                onClick={getb2bscheduledfunds}
+                                className="font-bold text-gray-600 uppercase"
                               >
-                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
-                                <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
-                                <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                B2B Funds
+                              </h2>
+                              <div className="font-sans font-semibold xl:text-2xl place-content-around">
+                                {isLoading ? (
+                                  // Step 2: Conditional rendering for the loading animation
+                                  <div
+                                    role="status"
+                                    className="max-w-sm animate-pulse"
+                                  >
+                                    <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                    <div className="h-2.5 bg-gray-200 rounded-full w-48 mb-4"></div>
+                                    <div className="h-2 bg-gray-200 rounded-full  max-w-[330px] mb-2.5"></div>
+                                  </div>
+                                ) : (
+                                  b2b_funds
+                                )}{" "}
+                                <span className="text-yellow-600">
+                                  <i className="fas fa-caret-up"></i>
+                                </span>
                               </div>
-                            ) : (
-                              b2b_funds
-                            )}{" "}
-                            <span className="text-yellow-600">
-                              <i className="fas fa-caret-up"></i>
-                            </span>
-                          </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3257,7 +3413,8 @@ function App() {
                   (selectedRows3.length > 0 && handleExportSelected3()) ||
                   (selectedRows4.length > 0 && handleExportSelected4()) ||
                   (selectedRows5.length > 0 && handleExportSelected5()) ||
-                  (selectedRows6.length > 0 && handleExportSelected6())}
+                  (selectedRows6.length > 0 && handleExportSelected6()) ||
+                  (selectedRow7.length > 0 && handleExportSelected7())}
               </div>
               <div className="rounded shadow-md sm:rounded-lg ">
                 {tableContent}
