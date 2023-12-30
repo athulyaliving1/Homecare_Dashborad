@@ -1254,6 +1254,54 @@ function App() {
         </span>
       ),
     },
+    // {
+    //   name: "Amount",
+    //   selector: "total_amount",
+    //   sortable: true,
+    //   width: "270px",
+    //   cell: (row) => {
+    //     const originalAmount = row.total_amount;
+    //     const gstRate = 0.09; // GST and CGST both at 9%
+
+    //     const gstAmount = originalAmount * gstRate;
+    //     const cgstAmount = originalAmount * gstRate;
+
+    //     const roundedGstAmount = Math.round(gstAmount);
+    //     const roundedCgstAmount = Math.round(cgstAmount);
+
+    //     const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+    //     return (
+    //       <span>
+    //         GST:{" "}
+    //         {new Intl.NumberFormat("en-IN", {
+    //           style: "currency",
+    //           currency: "INR",
+    //         }).format(roundedGstAmount)}
+    //         <br />
+    //         CGST:{" "}
+    //         {new Intl.NumberFormat("en-IN", {
+    //           style: "currency",
+    //           currency: "INR",
+    //         }).format(roundedCgstAmount)}
+    //         <br />
+    //         Net Amount:{" "}
+    //         {new Intl.NumberFormat("en-IN", {
+    //           style: "currency",
+    //           currency: "INR",
+    //         }).format(netAmount)}
+    //         <br />
+    //         Original Amount:{" "}
+    //         {new Intl.NumberFormat("en-IN", {
+    //           style: "currency",
+    //           currency: "INR",
+    //         }).format(originalAmount)}
+    //         <br />
+    //       </span>
+    //     );
+    //   },
+    // },
+
     {
       name: "Paid",
       selector: "amount_paid",
@@ -1316,34 +1364,57 @@ function App() {
   // export button 1 handling
 
   const handleExportSelected1 = () => {
-    const selectedDataToExport1 = selectedRows1.map((row, index) => ({
-      Sno: index + 1,
-      Branch: row.branch_name,
-      "Patient ID": row.patient_id,
-      "Patient Name": row.first_name,
-      "Invoice No": row.invoice_no,
-      "Invoice Date": row.dates,
-      Amount: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.total_amount)
-        .split(".")[0],
-      Paid: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.amount_paid)
-        .split(".")[0],
-      Status: row.status,
-    }));
+    const selectedDataToExport1 = selectedRows1.map((row, index) => {
+      const originalAmount = row.total_amount;
+      const gstRate = 0.09; // GST and CGST both at 9%
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+      return {
+        Sno: index + 1,
+        Branch: row.branch_name,
+        "Patient ID": row.patient_id,
+        "Patient Name": row.first_name,
+        "Invoice No": row.invoice_no,
+        "Invoice Date": row.dates,
+
+
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        Amount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(originalAmount).split(".")[0],
+        Paid: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(row.amount_paid).split(".")[0],
+        Status: row.status,
+      };
+    });
 
     selectedDataToExport1.sort((a, b) => a.Sno - b.Sno);
 
     return (
       <CSVLink
         data={selectedDataToExport1}
-        filename="table_value.csv"
+        filename="Receipt.csv"
         className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
       >
         <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
@@ -1435,13 +1506,20 @@ function App() {
   ];
 
   // export2 button handling
-
   const handleExportSelected2 = () => {
     const selectedDataToExport2 = selectedRows2.map((row) => {
       const assignedTasksArray = JSON.parse(row.assigned_tasks);
-      const assignedTasks = assignedTasksArray
-        .map((task) => task.task)
-        .join(", ");
+      const assignedTasks = assignedTasksArray.map((task) => task.task).join(", ");
+
+      const originalAmount = row.amount;
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
 
       return {
         "Patient Name": row.first_name,
@@ -1450,12 +1528,22 @@ function App() {
         "Schedule Date": row.schedule_date,
         "Membership Type": row.membership_type,
         "Assigned Tasks": assignedTasks,
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
         Amount: new Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
-        })
-          .format(row.amount)
-          .split(".")[0],
+        }).format(row.amount).split(".")[0],
         Status: row.status,
       };
     });
@@ -1472,6 +1560,8 @@ function App() {
       </CSVLink>
     );
   };
+
+
   const assignedTasksColumn1 = {
     name: "Assigned Tasks",
     selector: "assignedTasks",
@@ -1561,6 +1651,17 @@ function App() {
         .map((task) => task.task)
         .join(", ");
 
+      const originalAmount = row.amount
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+
+
       return {
         "Patient Name": row.first_name,
         Branch: row.branch_name,
@@ -1568,6 +1669,18 @@ function App() {
         "Schedule Date": row.schedule_date,
         "Membership Type": row.membership_type,
         "Assigned Tasks": assignedTasks,
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
         Amount: new Intl.NumberFormat("en-IN", {
           style: "currency",
           currency: "INR",
@@ -1581,7 +1694,7 @@ function App() {
     return (
       <CSVLink
         data={selectedDataToExport3}
-        filename="table_value.csv"
+        filename="Pendig_Schedule.csv"
         className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
       >
         <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
@@ -1690,21 +1803,43 @@ function App() {
   // export button 4 handling
 
   const handleExportSelected4 = () => {
-    const selectedDataToExport4 = selectedRows4.map((row, index) => ({
-      Sno: index + 1,
-      Branch: row.branch_name,
-      "Patient ID": row.patient_id,
-      "Patient Name": row.patient_name,
-      "Service Name": row.service_name,
-      "Service Date": row.service_date,
-      "Invoice No": row.invoice_no,
-      Amount: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.amount)
-        .split(".")[0],
-    }));
+    const selectedDataToExport4 = selectedRows4.map((row, index) => {
+      const originalAmount = row.amount;
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+      return {
+        Sno: index + 1,
+        Branch: row.branch_name,
+        "Patient ID": row.patient_id,
+        "Patient Name": row.patient_name,
+        "Service Name": row.service_name,
+        "Service Date": row.service_date,
+        "Invoice No": row.invoice_no,
+        Amount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(row.amount).split(".")[0],
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
+      };
+    });
 
     selectedDataToExport4.sort((a, b) => a.Sno - b.Sno);
 
@@ -1720,6 +1855,7 @@ function App() {
       </CSVLink>
     );
   };
+
 
   const columns5 = [
     {
@@ -1791,20 +1927,42 @@ function App() {
   ];
 
   const handleExportSelected5 = () => {
-    const selectedDataToExport5 = selectedRows5.map((row, index) => ({
-      Sno: index + 1,
-      Full_Name: row.full_name,
-      Branch: row.branch_name,
-      Schedule_Date: row.schedule_date,
-      CATEGORY_NAME: row.service_name,
-      SERVICE_NAME: row.service_name,
-      Amount: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.amount)
-        .split(".")[0],
-    }));
+    const selectedDataToExport5 = selectedRows5.map((row, index) => {
+      const originalAmount = row.amount;
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+      return {
+        Sno: index + 1,
+        Full_Name: row.full_name,
+        Branch: row.branch_name,
+        Schedule_Date: row.schedule_date,
+        CATEGORY_NAME: row.service_name,
+        SERVICE_NAME: row.service_name,
+        Amount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(row.amount).split(".")[0],
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
+      };
+    });
 
     selectedDataToExport5.sort((a, b) => a.Sno - b.Sno);
 
@@ -1820,6 +1978,7 @@ function App() {
       </CSVLink>
     );
   };
+
 
   const columns6 = [
     {
@@ -1904,30 +2063,53 @@ function App() {
   ];
 
   const handleExportSelected6 = () => {
-    const selectedDataToExport6 = selectedRows6.map((row, index) => ({
-      Sno: index + 1,
-      Branch_Name: row.branch_name,
-      Patient_Name: row.first_name,
-      Patient_ID: row.patient_id,
-      Receipt_Type: row.receipt_type,
-      Payment_Mode: row.payment_mode,
-      Reference_No: row.reference_no,
-      Receipt_No: row.receipt_no,
-      Receipt_Date: row.receipt_date,
-      Receipt_Amount: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.receipt_amount)
-        .split(".")[0],
-    }));
+    const selectedDataToExport6 = selectedRows6.map((row, index) => {
+      // Assuming selectedRows6 has necessary information for GST, CGST, and net amount
+      const originalAmount = row.receipt_amount;
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+      return {
+        Sno: index + 1,
+        Branch_Name: row.branch_name,
+        Patient_Name: row.first_name,
+        Patient_ID: row.patient_id,
+        Receipt_Type: row.receipt_type,
+        Payment_Mode: row.payment_mode,
+        Reference_No: row.reference_no,
+        Receipt_No: row.receipt_no,
+        Receipt_Date: row.receipt_date,
+        Receipt_Amount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(row.receipt_amount).split(".")[0],
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
+      };
+    });
 
     selectedDataToExport6.sort((a, b) => a.Sno - b.Sno);
 
     return (
       <CSVLink
         data={selectedDataToExport6}
-        filename="unapproved.csv"
+        filename="unallocatedfunds.csv"
         className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
       >
         <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
@@ -1937,87 +2119,53 @@ function App() {
     );
   };
 
-  const columns7 = [
-    {
-      name: "Sno",
-      cell: (row) => {
-        const index = tabledata7.indexOf(row);
-        return (currentPage1 - 1) * rowsPerPage6 + index + 1;
-      },
-      sortable: true,
-      width: "80px",
-    },
-    {
-      name: "BRANCH NAME",
-      selector: "branch_name",
-      sortable: true,
-      width: "230px",
-    },
-    {
-      name: "PATIENT NAME",
-      selector: "first_name",
-      sortable: true,
-      width: "170px",
-    },
-    {
-      name: "PATIENT ID",
-      selector: "patient_id",
-    },
-    {
-      name: "CATEGORY NAME",
-      selector: "category_name",
-      sortable: true,
-    },
-    {
-      name: "SERVICEREQUESTED",
-      selector: "service_requested",
-      sortable: true,
-    },
-    {
-      name: "schedule_date",
-      selector: "schedule_date",
-      sortable: true,
-    },
-    {
-      name: "Assign Task",
-      selector: "assign_task",
-      sortable: true,
-    },
-    {
-      name: "MEMBERSHIP TYPE",
-      selector: "membership_type",
-      sortable: true,
-    },
-    {
-      name: "AMOUNT",
-      selector: "amount",
-      sortable: true,
-    },
-  ];
+
 
   const handleExportSelected7 = () => {
-    const selectedDataToExport7 = selectedRow7.map((row, index) => ({
-      Sno: index + 1,
-      BRANCH_NAME: row.branch_name,
-      PATIENT_NAME: row.first_name,
-      PATIENT_ID: row.patient_id,
-      CATEGORY_NAME: row.category_name,
-      SERVICEREQUESTED: row.service_requested,
-      schedule_date: row.schedule_date,
-      Assign_Task: row.assign_task,
-      MEMBERSHIP_TYPE: row.membership_type,
-      AMOUNT: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      })
-        .format(row.amount)
-        .split(".")[0],
-    }));
+    const selectedDataToExport7 = selectedRow7.map((row, index) => {
+      const originalAmount = row.amount;
+      const gstRate = 0.09;
+
+      const gstAmount = originalAmount * gstRate;
+      const cgstAmount = originalAmount * gstRate;
+
+      const roundedGstAmount = Math.round(gstAmount);
+      const roundedCgstAmount = Math.round(cgstAmount);
+      const netAmount = originalAmount - roundedGstAmount - roundedCgstAmount;
+
+      return {
+        Sno: index + 1,
+        BRANCH_NAME: row.branch_name,
+        PATIENT_NAME: row.first_name,
+        PATIENT_ID: row.patient_id,
+        CATEGORY_NAME: row.category_name,
+        SERVICEREQUESTED: row.service_requested,
+        schedule_date: row.schedule_date,
+        Assign_Task: row.assign_task,
+        MEMBERSHIP_TYPE: row.membership_type,
+        AMOUNT: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(row.amount).split(".")[0],
+        GST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedGstAmount).split(".")[0],
+        CGST: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(roundedCgstAmount).split(".")[0],
+        NetAmount: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(netAmount).split(".")[0],
+      };
+    });
 
     return (
       <CSVLink
         data={selectedDataToExport7}
-        filename="table_value.csv"
+        filename="b2bfunds.csv"
         className="group [transform:translateZ(0)] px-6 py-3 rounded-lg overflow-hidden bg-gray-300 relative before:absolute before:bg-[#339966] before:top-1/2 before:left-1/2 before:h-2 before:w-9 before:-translate-y-1/2 before:-translate-x-1/2 before:rounded-sm  before:opacity-0 hover:before:scale-[6] hover:before:opacity-100 before:transition before:ease-in-out before:duration-500"
       >
         <span className="relative z-0 text-black transition duration-500 ease-in-out group-hover:text-gray-200">
@@ -2027,96 +2175,97 @@ function App() {
     );
   };
 
-  // const columns7 = [
-  //   {
-  //     name: "Sno",
-  //     // selector: 'id', // Adjust this to your data structure
-  //     cell: (row) => {
-  //       const index = tabledata1.indexOf(row);
-  //       return (currentPage1 - 1) * rowsPerPage1 + index + 1;
-  //     },
-  //     sortable: true,
-  //     width: "70px",
-  //   },
-  //   {
-  //     name: "Branch",
-  //     selector: "branch_name",
-  //     sortable: true,
-  //     width: "270px",
-  //   },
-  //   {
-  //     name: "Patient ID",
-  //     selector: "patient_id",
-  //     sortable: true,
-  //   },
-  //   {
-  //     name: "Patient Name",
-  //     selector: "first_name",
-  //     sortable: true,
-  //     width: "250px",
-  //   },
-  //   {
-  //     name: "Invoice No",
-  //     selector: "invoice_no",
-  //     sortable: true,
-  //   },
-  //   {
-  //     name: "Invoice Date",
-  //     selector: "dates",
-  //     sortable: true,
-  //   },
-  //   {
-  //     name: "Amount",
-  //     selector: "total_amount",
-  //     sortable: true,
-  //     cell: (row) => (
-  //       <span>
-  //         {
-  //           new Intl.NumberFormat("en-IN", {
-  //             style: "currency",
-  //             currency: "INR",
-  //           })
-  //             .format(row.total_amount)
-  //             .split(".")[0]
-  //         }
-  //       </span>
-  //     ),
-  //   },
-  //   {
-  //     name: "Paid",
-  //     selector: "amount_paid",
-  //     sortable: true,
-  //     cell: (row) => (
-  //       <span>
-  //         {
-  //           new Intl.NumberFormat("en-IN", {
-  //             style: "currency",
-  //             currency: "INR",
-  //           })
-  //             .format(row.amount_paid)
-  //             .split(".")[0]
-  //         }
-  //       </span>
-  //     ),
-  //   },
-  //   {
-  //     name: "Status",
-  //     selector: "status",
-  //     sortable: true,
-  //     cell: (row) => (
-  //       <span
-  //         className={`${row.status === "Pending"
-  //           ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-  //           : row.status === "Paid"
-  //             ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-  //             : "text-black" // Default color for other statuses
-  //           }`}
-  //       >
-  //         {row.status}
-  //       </span>
-  //     ),
-  //   },
-  // ];
+
+  const columns7 = [
+    {
+      name: "Sno",
+      // selector: 'id', // Adjust this to your data structure
+      cell: (row) => {
+        const index = tabledata1.indexOf(row);
+        return (currentPage1 - 1) * rowsPerPage1 + index + 1;
+      },
+      sortable: true,
+      width: "70px",
+    },
+    {
+      name: "Branch",
+      selector: "branch_name",
+      sortable: true,
+      width: "270px",
+    },
+    {
+      name: "Patient ID",
+      selector: "patient_id",
+      sortable: true,
+    },
+    {
+      name: "Patient Name",
+      selector: "first_name",
+      sortable: true,
+      width: "250px",
+    },
+    {
+      name: "Invoice No",
+      selector: "invoice_no",
+      sortable: true,
+    },
+    {
+      name: "Invoice Date",
+      selector: "dates",
+      sortable: true,
+    },
+    {
+      name: "Amount",
+      selector: "total_amount",
+      sortable: true,
+      cell: (row) => (
+        <span>
+          {
+            new Intl.NumberFormat("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })
+              .format(row.total_amount)
+              .split(".")[0]
+          }
+        </span>
+      ),
+    },
+    {
+      name: "Paid",
+      selector: "amount_paid",
+      sortable: true,
+      cell: (row) => (
+        <span>
+          {
+            new Intl.NumberFormat("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })
+              .format(row.amount_paid)
+              .split(".")[0]
+          }
+        </span>
+      ),
+    },
+    {
+      name: "Status",
+      selector: "status",
+      sortable: true,
+      cell: (row) => (
+        <span
+          className={`${row.status === "Pending"
+            ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+            : row.status === "Paid"
+              ? "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              : "text-black" // Default color for other statuses
+            }`}
+        >
+          {row.status}
+        </span>
+      ),
+    },
+  ];
 
   //------ If Data  False, then Table is Displayed without service Data --------------------------------------------
   if (firstbar == false) {
