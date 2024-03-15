@@ -8,4 +8,4 @@
 //   ("Access-Control-Allow-Origin", "http://124.123.68.117:4046");
 
 export const URLDevelopment =
-  ("Access-Control-Allow-Origin", "https://aal.athulyaliving.net");
+  ("Access-Control-Allow-Origin", "https://homecare.athulyaliving.net");
